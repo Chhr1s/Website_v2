@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(lavaan)
+library(ggplot2)
+library(tidyverse)
 ```
 ## During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don't know where to look. After subscribing to the Lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps I took to fit, compare, and interpret growth models in Lavaan (one of my favorite statistical packages/software I've ever used!)
 
@@ -234,7 +236,6 @@ full_fit <- growth(model = full_model,
                      data = sim_growth_dat,
                      meanstructure = T)
 full_fit_stats <- fitmeasures(full_fit, selected_fit_stats)
-full_fit_stats
 ```
 
 # Full Model Fit
@@ -269,23 +270,103 @@ title("Full Model")
 
 ## Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.
 
-```{r}
+```{r warning=FALSE}
 final_fit_boot<- growth(full_fit, data = sim_growth_dat, estimator = "ML",
                         meanstructure = T,
-                        se = "bootstrap", bootstrap = 5000,
+                        se = "bootstrap", 
+                        bootstrap = 5000,
                         parallel = "multicore")
 
-parameterEstimates(final_fit_boot, level = .95, boot.ci.type = "bca.simple", output = "pretty", stand = T)
+parameterEstimates(final_fit_boot, 
+                   level = .95, 
+                   boot.ci.type = "bca.simple", 
+                   stand = T)[64:66,c(4,5,9,10)]
 ```
+
+## The model was stable, meaning it converged without issue most times. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call `{summary(full_fit, fit.measures = T)}`, which I didn't do for brevity. 
+
+## furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in `{lavaan}`. As a note, you should not trust the p-values from this parameterEstimates() call, if you use any `boot.ci.type` other than `norm`, as that is how the p-value is calculated. You can see a discussion between me & the lavaan Google Group about this. It may be changed in the future, but is not of yet. Simply report Confidence Intervals (95% in my case)
+
+
 
 # Plotting
 
-```{r}
-
-```
-## Factor Scores
+## We can plot the growth of these traits, as well with `{ggplot2}`
+## First we extract factor scores & save this as a data frame, then we can plot.
+### For a linear model, this is pretty simple:
 
 ```{r}
 plot_dat <- lavPredict(full_fit) %>% data.frame()
-plot_dat
+
+plot_X <- ggplot(data=plot_dat) +
+scale_x_continuous(name = "Timepoint",
+                 limits=c(0,3),
+                 breaks = c(0, 1, 2, 3),
+                 labels = c('1', '2', '3', '4')
+                 ) +
+scale_y_continuous(name = "X",
+                 limits=c(0,30)
+                 )+
+  geom_abline(data=plot_dat, 
+              mapping=aes(slope=sX, 
+                          intercept=iX), 
+              color = "lightblue") + 
+  theme_minimal()
+plot_X
+```
+
+## For a quadratic model, this is more challenging, but here's some code to do it. First we'll write a function that takes an argument `{y}`, and puts
+
+```{r}
+plot_dat <- lavPredict(full_fit) %>% data.frame()
+
+qY <- plot_dat$qY
+sY <- plot_dat$sY
+iY <- plot_dat$iY
+
+test <- function(y) {qY*y ^ 2 + sY*y + iY}
+
+
+
+nrow(plot_dat)
+plot_dat_2<-data.frame(`T1` = test(0), 
+                       `T2` = test(1), 
+                       `T3` = test(2), 
+                       `T4` = test(3), 
+                       row.names = 1:nrow(plot_dat))
+
+names(plot_dat) <- c('1', '2', '3', '4') 
+
+test0 <-test(0)
+test1<-test(1)
+test2<-test(2)
+test3<-test(3)
+
+Y_df <- matrix(c(test0, 
+                 test1, 
+                 test2, 
+                 test3), 
+               ncol = 1)
+
+df_long_wave <- matrix(c(rep(1,500), 
+                        rep(2, 500),
+                        rep(3, 500), 
+                        rep(4, 500)), 
+                      ncol = 1)
+
+
+plot_dat_2 <- data.frame(id = matrix(
+  rep(1:500,4), ncol = 1),
+  Timepoint = df_long_wave,
+  Y = Y_df)
+
+
+plot_Y <- plot_dat_2 %>% ggplot(aes(x = Timepoint, 
+                          y = Y, 
+                          group = id,)) +
+ geom_smooth(formula = y ~ x + I(x^2), 
+             method = "lm", se = F)+
+  theme_minimal() 
+
+plot_Y
 ```
