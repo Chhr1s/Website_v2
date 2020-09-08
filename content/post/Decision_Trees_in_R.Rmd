@@ -50,7 +50,7 @@ set.seed(100)
 # *recode NA's for lang_cd and ayp_lep to more meaningful values
 # *remove vars with entirely missing data
 # Note: the data is called 'train.csv', but we will actually further split this into its own training and testing data
-dat <- read_csv(here::here("static", "data", "train.csv")) %>% 
+dat <- read_csv("train.csv") %>% 
   select(-classification) %>% # remove this variable because it's redundant with `score`
   mutate(lang_cd = ifelse(is.na(lang_cd), "E", lang_cd), 
          ayp_lep = ifelse(is.na(ayp_lep), "G", ayp_lep)) %>% 
@@ -59,8 +59,8 @@ dat <- read_csv(here::here("static", "data", "train.csv")) %>%
   drop_na() %>% 
   select_if(~length(unique(.x)) > 1)
 # import fall membership report ethcnicity data and do some basic cleaning and renaming
-sheets <- readxl::excel_sheets(here::here("static", "data", "fallmembershipreport_20192020.xlsx"))
-ode_schools <- readxl::read_xlsx(here::here("static", "data", "fallmembershipreport_20192020.xlsx"),
+sheets <- readxl::excel_sheets("fallmembershipreport_20192020.xlsx")
+ode_schools <- readxl::read_xlsx("fallmembershipreport_20192020.xlsx",
                                  sheet = sheets[4])
 ethnicities <- ode_schools %>%
   select(attnd_schl_inst_id = `Attending School ID`,

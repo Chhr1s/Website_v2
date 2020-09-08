@@ -7,7 +7,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2016. All rights reserved.</copyright>
-    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Tue, 08 Sep 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
@@ -34,14 +34,32 @@ We&amp;rsquo;ll start with creating a new site with a very basic template.</desc
     </item>
     
     <item>
+      <title>Growth &amp; Parallel Process Models</title>
+      <link>/post/growth-parallel-process-models/</link>
+      <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/growth-parallel-process-models/</guid>
+      <description>Intro During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!</description>
+    </item>
+    
+    <item>
+      <title>Tidymodels: Decision Tree Learning in R</title>
+      <link>/post/decision_trees_in_r/</link>
+      <pubDate>Tue, 02 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/decision_trees_in_r/</guid>
+      <description>Intro Tidyverse’s newest release has recently come together to form a cohesive suite of packages for modeling and machine learning, called {tidymodels}. The successor to Max Kuhn’s {caret} package, {tidymodels} allows for a tidy approach to your data from start to finish. We’re going to walk through the basics for getting off the ground with {tidymodels} and demonstrate its application to three different tree-based methods for predicting student test scores.</description>
+    </item>
+    
+    <item>
       <title>Hello R Markdown</title>
       <link>/post/2015-07-23-r-rmarkdown/</link>
       <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
       
       <guid>/post/2015-07-23-r-rmarkdown/</guid>
-      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+      <description>from https://www.storybench.org/how-to-build-a-website-with-blogdown-in-r/  R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
 You can embed an R code chunk like this:
-summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.</description>
     </item>
     
     <item>
@@ -66,6 +84,15 @@ More complete instructions are available at installing hugo
 Step 2. Build the Docs Hugo has its own example site which happens to also be the documentation site you are reading right now.
 Follow the following steps:
  Clone the hugo repository Go into the repo Run hugo in server mode and build the docs Open your browser to http://localhost:1313  Corresponding pseudo commands:</description>
+    </item>
+    
+    <item>
+      <title>Growth &amp; Parallel Process Models in Lavaan</title>
+      <link>/post/growth_and_parallel_process_modeling/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/post/growth_and_parallel_process_modeling/</guid>
+      <description>During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!</description>
     </item>
     
   </channel>

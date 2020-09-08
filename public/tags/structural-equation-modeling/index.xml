@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Structural Equation Modeling on Christopher Loan&#39;s Website</title>
+    <link>/tags/structural-equation-modeling/</link>
+    <description>Recent content in Structural Equation Modeling on Christopher Loan&#39;s Website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2016. All rights reserved.</copyright>
+    <lastBuildDate>Tue, 08 Sep 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/structural-equation-modeling/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Growth &amp; Parallel Process Models</title>
+      <link>/post/growth-parallel-process-models/</link>
+      <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/post/growth-parallel-process-models/</guid>
+      <description>Intro During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!</description>
+    </item>
+    
+  </channel>
+</rss>

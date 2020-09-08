@@ -1,25 +1,278 @@
----
-title: "Growth & Parallel Process Models in Lavaan"
-author: "Christopher Loan"
-date: "8/13/2020"
-output: html_document
----
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="generator" content="Hugo 0.74.3" />
+
+  <title>Growth &amp; Parallel Process Models &middot; Christopher Loan&#39;s Website</title>
+
+    
+
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/pure-min.css">
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-old-ie-min.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/1.0.0/grids-responsive-min.css">
+  <!--<![endif]-->
+
+  <!--[if lte IE 8]>
+  <link rel="stylesheet" href="/css/side-menu-old-ie.css">
+  <![endif]-->
+  <!--[if gt IE 8]><!-->
+  <link rel="stylesheet" href="/css/side-menu.css">
+  <!--<![endif]-->
+
+  <link rel="stylesheet" href="/css/blackburn.css">
+
+  
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.9.0/css/all.css">
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" type="text/css">
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+ 
+  
+
+  
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/androidstudio.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  
+  <script>hljs.initHighlightingOnLoad();</script>
+  
+
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+
+  
+  
+
+</head>
 
 
+<body>
+<div id="layout">
 
-<div id="during-my-ms-i-worked-on-a-few-manuscripts-which-used-growth-modeling.-these-topics-are-well-supported-but-sometimes-the-support-is-hard-to-find-if-you-dont-know-where-to-look.-after-subscribing-to-the-lavaan-support-google-group-i-saw-many-people-requesting-growth-model-andor-parallel-process-model-support.-i-responded-back-to-people-a-few-times-but-i-figured-it-was-just-better-to-put-a-perminant-link-up-showing-the-steps-that-can-be-used-to-fit-compare-and-interpret-growth-models-in-lavaan-one-of-my-favorite-statistical-packagessoftware-ive-ever-used.-consider-what-i-give-you-the-nuts-and-bolts-and-you-should-refer-to-other-resources-for-more-in-depth-interpretations." class="section level4">
-<h4>During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.</h4>
-<div id="note-i-will-expect-you-understand-lavaan-somewhat-or-at-least-can-refer-to-yves-or-others-work-on-syntax.-i-will-give-brief-mentions-to-various-syntax-elements." class="section level5">
-<h5>Note: I will expect you understand lavaan somewhat, or at least can refer to Yve’s (or others’) work on syntax. I will give <em>brief</em> mentions to various syntax elements.</h5>
+  
+<a href="#menu" id="menuLink" class="menu-link">
+  
+  <span></span>
+</a>
+<div id="menu">
+
+  
+  <a class="pure-menu-heading brand" href="/">Blackburn</a>
+
+
+  <div class="pure-menu">
+    <ul class="pure-menu-list">
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="/"><i class='fa fa-home fa-fw'></i>Home</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="/post/"><i class='fa fa-list fa-fw'></i>Posts</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="/about/"><i class='fa fa-user fa-fw'></i>About</a>
+      
+        </li>
+      
+      
+        <li class="pure-menu-item">
+          <a class="pure-menu-link" href="/contact/"><i class='fa fa-phone fa-fw'></i>Contact</a>
+      
+        </li>
+      
+    </ul>
+  </div>
+
+  <div class="pure-menu social">
+  <ul class="pure-menu-list">
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://twitter.com/*" rel="me" target="_blank"><i class="fab fa-twitter-square fa-fw"></i>Twitter</a>
+    </li>
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://facebook.com/*" rel="me" target="_blank"><i class="fab fa-facebook-square fa-fw"></i>Facebook</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://instagram.com/*" rel="me" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://linkedin.com/in/*" rel="me" target="_blank"><i class="fab fa-linkedin"></i></i>LinkedIn</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://github.com/yoshiharuyamashita" rel="me" target="_blank"><i class="fab fa-github-square fa-fw"></i>GitHub</a>
+    </li>
+    
+
+    
+
+    
+
+    
+    <li class="pure-menu-item">
+      <a class="pure-menu-link" href="https://stackoverflow.com/users/*" rel="me" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>Stack Overflow</a>
+    </li>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+  </ul>
+</div>
+
+
+  <div>
+  <div class="small-print">
+    <small>&copy; 2016. All rights reserved.</small>
+  </div>
+  <div class="small-print">
+    <small>Built with&nbsp;<a href="https://gohugo.io/" target="_blank">Hugo</a></small>
+    <small>Theme&nbsp;<a href="https://github.com/yoshiharuyamashita/blackburn" target="_blank">Blackburn</a></small>
+  </div>
+</div>
+
+</div>
+
+
+  <div id="main">
+
+
+<div class="header">
+  <h1>Growth &amp; Parallel Process Models</h1>
+  <h2></h2>
+</div>
+<div class="content">
+
+  <div class="post-meta">
+
+  <div>
+    <i class="fa fa-calendar fa-fw"></i>
+    <time>08 Sep 2020, 00:00</time>
+  </div>
+
+  
+
+  
+  
+  
+  
+
+  
+  
+  
+  <div>
+    <i class="fa fa-tags fa-fw"></i>
+    
+      <a class="post-taxonomy-tag" href="/tags/sem">SEM</a>&nbsp;&#47;
+    
+      <a class="post-taxonomy-tag" href="/tags/structural-equation-modeling">Structural Equation Modeling</a>
+    
+  </div>
+  
+  
+
+</div>
+
+  
+
+
+<div id="intro" class="section level1">
+<h1>Intro</h1>
+<p>During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.</p>
+<div id="note-i-will-expect-you-understand-lavaan-somewhat-or-at-least-can-refer-to-yves-or-others-work-on-syntax.-i-will-give-brief-mentions-to-various-syntax-elements." class="section level4">
+<h4>Note: I will expect you understand lavaan somewhat, or at least can refer to Yves’ (or others’) work on syntax. I will give <em>brief</em> mentions to various syntax elements.</h4>
 </div>
 </div>
 <div id="step-0-simulating-data" class="section level1">
 <h1>Step 0: Simulating Data</h1>
-<div id="in-order-to-complete-this-project-i-simulated-some-data.-for-simplicity-i-actually-used-lavaan-which-gives-me-500-observations-by-default." class="section level4">
-<h4>In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default.</h4>
-</div>
-<div id="it-was-easist-to-just-make-data-that-would-fit-a-parallel-process-model-with-that-being-our-end-goal-anyways.-specifically-i-made-two-variables-which-were-collected-across-4-waves-assumed-to-be-equal-in-distance-x1-x-at-time-1-x2-x-at-time-2-etc..-heres-the-code-i-used-to-specify-the-data" class="section level4">
-<h4>It was easist to just make data that would fit a parallel process model, with that being our end goal anyways. Specifically, I made two variables which were “collected” across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.). Here’s the code I used to specify the data:</h4>
+<p>In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default. 
+It was easist to just make data that would fit a parallel process model, with that being our end goal anyways. Specifically, I made two variables which were “collected” across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.). Here’s the code I used to specify the data:</p>
 <pre class="r"><code>growth_mod &lt;- 
   &#39;
 ## intercept &amp; slope growth terms for X
@@ -50,9 +303,7 @@ qY ~ -2*1
 outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
 
   &#39;</code></pre>
-</div>
-<div id="in-the-data-im-simulateing-variable-x-is-changing-linearly-over-time-and-variable-y-is-changing-quadratically.-quadratic-terms-represent-the-rate-of-change-of-the-slope-on-average-across-the-waves.-this-is-synonymous-with-acceleration-though-this-terminology-is-not-often-used-quadratic-growth-is-typically-preferred" class="section level4">
-<h4>In the data I’m simulateing, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically. Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</h4>
+<p>In the data I’m simulateing, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically. Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
 <pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
                                model.type = &quot;growth&quot;, 
                                seed = 82020, 
@@ -66,7 +317,6 @@ outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
                                # meanstructure = T,
                                # orthogonal = F, 
                                # standardized = T)</code></pre>
-</div>
 <div id="fit-statistics" class="section level2">
 <h2>Fit statistics</h2>
 <div id="its-good-practice-to-have-a-set-of-fit-statistcs-specified-a-priori-so-you-arent-cherry-picking-good-and-bad-results.-heres-a-spread-of-them-ive-selected" class="section level4">
@@ -81,10 +331,10 @@ outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
                          )</code></pre>
 </div>
 </div>
-<div id="assessing-functional-form" class="section level2">
-<h2>Assessing Functional Form</h2>
-<div id="time-to-first-fit-the-model-to-an-intercept-only-model-i.e.-no-growth-observed-then-look-at-linear-growth-linear-intercept-then-quadratic-growth-quadratic-linear-intercept." class="section level4">
-<h4>time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).</h4>
+</div>
+<div id="assessing-functional-form" class="section level1">
+<h1>Assessing Functional Form</h1>
+<p>Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).</p>
 <pre class="r"><code>int_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -126,9 +376,7 @@ int_y_fit_stats</code></pre>
 ## rmsea.scaled           0.9570186
 ## rmsea.pvalue.scaled    0.0000000
 ## srmr                   1.9360811</code></pre>
-</div>
-<div id="neither-of-those-fit-well-so-we-can-add-a-higher-order-fit-term.-specifically-we-will-check-how-well-a-linear-only-growth-model-fits-for-the-x-y-variables" class="section level4">
-<h4>Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the <code>{x}</code> &amp; <code>{y}</code> variables</h4>
+<p>Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the <code>{x}</code> &amp; <code>{y}</code> variables</p>
 <pre class="r"><code>linear_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -173,9 +421,7 @@ linear_y_fit_stats</code></pre>
 ## rmsea.scaled           0.6859599
 ## rmsea.pvalue.scaled    0.0000000
 ## srmr                   1.2678251</code></pre>
-</div>
-<div id="looks-like-the-linear-x-fits-very-well-but-not-y.-we-should-check-if-the-quadratic-growth-models-fit-well.-well-do-both-variables-in-case-a-quadratic-model-fits-the-x-better-than-the-linear-model-for-x." class="section level4">
-<h4>Looks like the linear <code>{x}</code> fits very well, but not <code>{y}</code>. We should check if the quadratic growth models fit well. We’ll do both variables, in case a quadratic model fits the <code>{x}</code> better than the linear model for <code>{x}</code>.</h4>
+<p>Looks like the linear <code>{x}</code> fits very well, but not <code>{y}</code>. We should check if the quadratic growth models fit well. We’ll do both variables, in case a quadratic model fits the <code>{x}</code> better than the linear model for <code>{x}</code>.</p>
 <pre class="r"><code>quad_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -214,14 +460,11 @@ quad_y_fit_stats</code></pre>
 ##               0.007               0.932               1.000               1.000 
 ##        rmsea.scaled rmsea.pvalue.scaled                srmr 
 ##               0.000               0.963               0.000</code></pre>
+<p>It’s clear that only the <code>{x}</code> linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that’s the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests.</p>
 </div>
-<div id="its-clear-that-only-the-x-linear-model-was-a-good-one-by-all-fit-statistics.-when-using-realworld-datarather-than-data-simulated-to-be-specific-functional-formsthis-may-or-may-not-be-the-case.-if-thats-the-case-there-are-resources-about-comparing-models.-one-popular-way-is-through-likelihood-ratio-tests-or-chi-square-difference-tests." class="section level4">
-<h4>It’s clear that only the <code>{x}</code> linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that’s the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests.</h4>
-</div>
-<div id="parallel-process-model" class="section level3">
-<h3>Parallel process model</h3>
-<div id="now-that-we-are-fairly-confident-in-functional-forms-lets-model-them-together" class="section level4">
-<h4>Now that we are fairly confident in functional forms, let’s model them together</h4>
+<div id="parallel-process-model" class="section level1">
+<h1>Parallel process model</h1>
+<p>Now that we are fairly confident in functional forms, let’s model them together</p>
 <pre class="r"><code>full_model &lt;- 
   &#39;
 ## intercept &amp; slope growth terms for X
@@ -253,12 +496,9 @@ full_fit &lt;- growth(model = full_model,
                      meanstructure = T)
 full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 </div>
-</div>
-</div>
-<div id="full-model-fit" class="section level2">
-<h2>Full Model Fit</h2>
-<div id="we-can-see-that-this-model-fits-well-across-all-fit-statistics-chosen.-this-model-is-deemed-acceptable-and-we-can-now-interpret-the-model-results" class="section level4">
-<h4>We can see that this model fits well across all fit statistics chosen. This model is deemed acceptable and we can now interpret the model results</h4>
+<div id="full-model-fit" class="section level1">
+<h1>Full Model Fit</h1>
+<p>We can see that this model fits well across all fit statistics chosen. This model is deemed acceptable and we can now interpret the model results</p>
 <pre class="r"><code>summary(full_fit,
         stand = T,
         rsq = T)</code></pre>
@@ -393,19 +633,14 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 ##     iX_sX_outcome     0.979    0.236    4.141    0.000    1.026    0.236
 ##     iY_sY_outcome    -0.845    0.259   -3.259    0.001   -0.907   -0.208
 ##     sY_qY_outcome    -0.315    0.208   -1.515    0.130   -0.373   -0.086</code></pre>
-</div>
-</div>
 <div id="diagram" class="section level2">
 <h2>Diagram</h2>
-<div id="direct-paths-regressions" class="section level3">
-<h3>Direct Paths / Regressions</h3>
-<div id="the-model-shows-that-the-variable-outcome-is-predicted-significantly-by-linear-slopes-of-both-x-and-y-i.e.-sx-sy-as-well-as-the-qy.-baseline-levels-of-both-variables-ix-iy-did-not-significantly-predict-the-outcome." class="section level5">
-<h5>The model shows that the variable <code>{outcome}</code> is predicted significantly by linear slopes of both <code>{x}</code> and <code>{y}</code> (i.e., <code>{sX}</code> &amp; <code>{sY}</code>), as well as the <code>{qY}</code>. Baseline levels of both variables (<code>{iX}</code> &amp; <code>{iY}</code>) did not significantly predict the outcome.</h5>
 </div>
 </div>
-<div id="we-observed-a-significant-indirect-effect-from-baseline-ix-through-sx-to-the-outcome-which-is-likely-why-we-do-not-see-a-direct-effect-of-ix-on-the-outcome.-the-same-process-is-observed-in-y.-there-was-no-indirect-effect-from-sy-to-qy-on-outcome" class="section level3">
-<h3>We observed a significant indirect effect from baseline <code>{iX}</code> through <code>{sX}</code> to the <code>{outcome}</code>, which is likely why we do not see a direct effect of <code>{iX}</code> on the <code>{outcome}</code>. The same process is observed in <code>{Y}</code>. There was no indirect effect from <code>{sY}</code> to <code>{qY}</code> on <code>{outcome}</code></h3>
-</div>
+<div id="direct-paths-regressions" class="section level1">
+<h1>Direct Paths / Regressions</h1>
+<p>The model shows that the variable <code>{outcome}</code> is predicted significantly by linear slopes of both <code>{x}</code> and <code>{y}</code> (i.e., <code>{sX}</code> &amp; <code>{sY}</code>), as well as the <code>{qY}</code>. Baseline levels of both variables (<code>{iX}</code> &amp; <code>{iY}</code>) did not significantly predict the outcome. </p>
+<p>We observed a significant indirect effect from baseline <code>{iX}</code> through <code>{sX}</code> to the <code>{outcome}</code>, which is likely why we do not see a direct effect of <code>{iX}</code> on the <code>{outcome}</code>. The same process is observed in <code>{Y}</code>. There was no indirect effect from <code>{sY}</code> to <code>{qY}</code> on <code>{outcome}</code></p>
 <div id="covariances" class="section level3">
 <h3>Covariances</h3>
 </div>
@@ -413,11 +648,9 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 <h3>Means / Intercepts</h3>
 </div>
 </div>
-</div>
 <div id="bootstrapping" class="section level1">
 <h1>Bootstrapping</h1>
-<div id="bootstrapping-is-a-resampling-method-with-replacement-that-is-appreciated-for-building-confidence-intervals-around-parameter-estimates-of-indirect-effects-at-least-in-part-because-they-do-not-make-distributional-assumptions-about-the-indirect-effect.-this-creates-a-more-reliable-test-than-standard-significance-tests.-a-quick-google-scholar-search-can-inform-you-on-this-topic-better-than-i-can-but-i-used-this-to-test-the-indirect-effects-using-5000-simulated-data-sets." class="section level2">
-<h2>Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.</h2>
+<p>Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.</p>
 <pre class="r"><code>final_fit_boot&lt;- growth(full_fit, data = sim_growth_dat, estimator = &quot;ML&quot;,
                         meanstructure = T,
                         se = &quot;bootstrap&quot;,
@@ -432,22 +665,14 @@ parameterEstimates(final_fit_boot,
 ## 64 iX_sX_outcome  0.979    0.591    1.604
 ## 65 iY_sY_outcome -0.845   -1.335   -0.163
 ## 66 sY_qY_outcome -0.315   -0.680    0.098</code></pre>
+<p>The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call <code>{summary(full_fit, fit.measures = T)}</code>, which I didn’t do for brevity. </p>
+<p>Furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in <code>{lavaan}</code>. As a note, you should <em>not</em> trust the p-values from this parameterEstimates() if you go with anything but the default for <code>boot.ci.type =</code> if you use any <code>boot.ci.type</code> other than <code>norm</code>, as that is how the p-value is calculated. You can see a discussion between me &amp; the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).</p>
 </div>
-<div id="the-model-converged-nearly-every-time-without-issue.-of-our-5000-bootstrap-draws-only-7-were-not-successful-this-is-not-shown-here-but-is-if-you-call-summaryfull_fit-fit.measures-t-which-i-didnt-do-for-brevity." class="section level2">
-<h2>The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call <code>{summary(full_fit, fit.measures = T)}</code>, which I didn’t do for brevity.</h2>
-</div>
-<div id="furthermore-we-find-the-same-results-as-we-did-regarding-the-indirect-effect-as-without-bootstrapping.-these-are-the-results-i-trust-more-especially-since-we-used-the-bca-simple-variant-used-in-lavaan.-as-a-note-you-should-not-trust-the-p-values-from-this-parameterestimates-if-you-go-with-anything-but-the-default-for-boot.ci.type-if-you-use-any-boot.ci.type-other-than-norm-as-that-is-how-the-p-value-is-calculated.-you-can-see-a-discussion-between-me-the-lavaan-google-group-about-this-if-you-do-some-digging.-it-may-be-changed-in-the-future-but-is-not-of-yet-to-my-knowledge.-simply-report-confidence-intervals-95-in-my-case." class="section level2">
-<h2>furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in <code>{lavaan}</code>. As a note, you should <em>not</em> trust the p-values from this parameterEstimates() if you go with anything but the default for <code>boot.ci.type =</code> if you use any <code>boot.ci.type</code> other than <code>norm</code>, as that is how the p-value is calculated. You can see a discussion between me &amp; the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).</h2>
-</div>
-<div id="plotting" class="section level2">
-<h2>Plotting</h2>
-<div id="we-can-plot-the-growth-of-these-traits-as-well-with-ggplot2" class="section level4">
-<h4>We can plot the growth of these traits, as well with <code>{ggplot2}</code></h4>
-</div>
-<div id="first-we-extract-factor-scores-save-this-as-a-data-frame-then-we-can-plot." class="section level4">
-<h4>First we extract factor scores &amp; save this as a data frame, then we can plot.</h4>
-<div id="for-a-linear-model-this-is-pretty-simple" class="section level5">
-<h5>For a linear model, this is pretty simple:</h5>
+<div id="plotting" class="section level1">
+<h1>Plotting</h1>
+<p>We can plot the growth of these traits, as well with <code>{ggplot2}</code> 
+First we extract factor scores &amp; save this as a data frame, then we can plot.
+For a linear model, this is pretty simple:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
 
 plot_X &lt;- ggplot(data=plot_dat) +
@@ -465,11 +690,8 @@ scale_y_continuous(name = &quot;X&quot;,
               color = &quot;lightblue&quot;) + 
   theme_minimal()
 plot_X</code></pre>
-<p><img src="/post/Growth_and_Parallel_Process_Modeling_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
-</div>
-</div>
-<div id="for-a-quadratic-model-this-is-more-challenging-but-heres-some-code-to-do-it.-first-well-write-a-function-that-takes-an-argument-y-and-puts" class="section level4">
-<h4>For a quadratic model, this is more challenging, but here’s some code to do it. First we’ll write a function that takes an argument <code>{y}</code>, and puts</h4>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>For a quadratic model, this is more challenging, but here’s some code to do it:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
 
 qY &lt;- plot_dat$qY
@@ -522,7 +744,133 @@ plot_Y &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint,
   theme_minimal() 
 
 plot_Y</code></pre>
-<p><img src="/post/Growth_and_Parallel_Process_Modeling_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+
+  
+  <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
+<ul class="share-buttons">
+	<li><a href="https://www.facebook.com/sharer/sharer.php?u=%2fpost%2fgrowth-parallel-process-models%2f" target="_blank" title="Share on Facebook"><i class="fa-facebook" aria-hidden="true"></i><span class="sr-only">Share on Facebook</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://twitter.com/intent/tweet?source=%2fpost%2fgrowth-parallel-process-models%2f&via=HorribleGeek" target="_blank" title="Tweet"><i class="fa-twitter" aria-hidden="true"></i><span class="sr-only">Tweet</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="https://plus.google.com/share?url=%2fpost%2fgrowth-parallel-process-models%2f" target="_blank" title="Share on Google+"><i class="fa-google-plus" aria-hidden="true"></i><span class="sr-only">Share on Google+</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.tumblr.com/share?v=3&u=%2fpost%2fgrowth-parallel-process-models%2f" target="_blank" title="Post to Tumblr"><i class="fa-tumblr" aria-hidden="true"></i><span class="sr-only">Post to Tumblr</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://pinterest.com/pin/create/button/?url=%2fpost%2fgrowth-parallel-process-models%2f" target="_blank" title="Pin it"><i class="fa-pinterest-p" aria-hidden="true"></i><span class="sr-only">Pin it</span></a>
+	</li>&nbsp;&nbsp;&nbsp;
+	<li><a href="http://www.reddit.com/submit?url=%2fpost%2fgrowth-parallel-process-models%2f" target="_blank" title="Submit to Reddit"><i class="fa-reddit-alien" aria-hidden="true"></i><span class="sr-only">Submit to Reddit</span></a>
+	</li>
+</ul>
+
+
+<style>
+	ul.share-buttons{
+	  list-style: none;
+	  padding: 0;
+	}
+
+	ul.share-buttons li{
+	  display: inline;
+	}
+
+	ul.share-buttons .sr-only{
+	  position: absolute;
+	  clip: rect(1px 1px 1px 1px);
+	  clip: rect(1px, 1px, 1px, 1px);
+	  padding: 0;
+	  border: 0;
+	  height: 1px;
+	  width: 1px;
+	  overflow: hidden;
+	}
+</style>
+
+
+  
+<div class="prev-next-post pure-g">
+  <div class="pure-u-1-24" style="text-align: left;">
+    
+    <a href="/post/decision_trees_in_r/"><i class="fa fa-chevron-left"></i></a>
+    
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="prev">
+      <a href="/post/decision_trees_in_r/">Tidymodels: Decision Tree Learning in R</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-2-24">
+    &nbsp;
+  </div>
+  <div class="pure-u-10-24">
+    
+    <nav class="next">
+      <a href="/post/migrate-from-jekyll/">Migrate to Hugo from Jekyll</a>
+    </nav>
+    
+  </div>
+  <div class="pure-u-1-24" style="text-align: right;">
+    
+    <a href="/post/migrate-from-jekyll/"><i class="fa fa-chevron-right"></i></a>
+    
+  </div>
+</div>
+
+
+
+  
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+
+(function() {
+    
+    
+    if (window.location.hostname == "localhost")
+        return;
+
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    var disqus_shortname = 'Your Disqus shortname';
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</div>
+
 </div>
 </div>
-</div>
+<script src="/js/ui.js"></script>
+<script src="/js/menus.js"></script>
+
+
+<script>
+  
+  if (window.location.hostname != "localhost") {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'Your Google Analytics tracking ID', 'auto');
+    ga('send', 'pageview');
+  }
+</script>
+
+
+
+
+
+<script src="/js/math-code.js"></script>
+  <script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  
+
+
+</body>
+</html>
+

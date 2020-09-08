@@ -1,8 +1,15 @@
 ---
-title: "Growth & Parallel Process Models in Lavaan"
-author: "Christopher Loan"
-date: "8/13/2020"
-output: html_document
+title: Growth & Parallel Process Models
+author: Christopher Loan
+date: '2020-09-08'
+slug: growth-parallel-process-models
+categories:
+  - Structural Equation Modeling
+tags:
+  - SEM
+  - Structural Equation Modeling
+description: ''
+topics: []
 ---
 
 ```{r setup, include=FALSE}
@@ -11,17 +18,18 @@ library(semPlot)
 library(ggplot2)
 library(tidyverse)
 ```
-#### During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don't know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I've ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.
+# Intro 
 
-##### Note: I will expect you understand lavaan somewhat, or at least can refer to Yve's (or others') work on syntax. I will give *brief* mentions to various syntax elements.
+During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don't know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I've ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.
+
+#### Note: I will expect you understand lavaan somewhat, or at least can refer to Yves' (or others') work on syntax. I will give *brief* mentions to various syntax elements.
 
 # Step 0: Simulating Data
 
-#### In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default.
+In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default. \n
+It was easist to just make data that would fit a parallel process model, with that being our end goal anyways.\n Specifically, I made two variables which were "collected" across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.).  I will share the code I used to simulate the data at the end of the page so you can follow through these steps as if you didn't know. 
 
-#### It was easist to just make data that would fit a parallel process model, with that being our end goal anyways. Specifically, I made two variables which were "collected" across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.).  Here's the code I used to specify the data:
-
-```{r}
+```{r include=FALSE}
 
 growth_mod <- 
   '
@@ -56,11 +64,7 @@ outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
 ```
 
 
-#### In the data I'm simulateing, Variable `{x}` is changing linearly over time and variable `{y}` is changing quadratically. Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; 'quadratic growth' is typically preferred 
-
-
-
-```{r}
+```{r include=FALSE}
 sim_growth_dat <- simulateData(model = growth_mod, 
                                model.type = "growth", 
                                seed = 82020, 
@@ -89,9 +93,9 @@ selected_fit_stats <-   c("chisq.scaled",
                          "srmr"
                          )
 ```
-## Assessing Functional Form 
+# Assessing Functional Form 
 
-#### time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).
+Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).
 
 ```{r}
 int_x_mod <- 
@@ -122,7 +126,7 @@ int_y_fit_stats<-fitmeasures(int_y_fit, selected_fit_stats) %>% data.frame()
 int_y_fit_stats
 ```
 
-#### Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the `{x}` & `{y}` variables
+Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the `{x}` & `{y}` variables
 
 ```{r}
 linear_x_mod <- 
@@ -154,7 +158,10 @@ linear_y_fit <- growth(model = linear_y_mod,
 linear_y_fit_stats<-fitmeasures(linear_y_fit, selected_fit_stats) %>% data.frame()
 linear_y_fit_stats
 ```
-#### Looks like the linear `{x}` fits very well, but not `{y}`. We should check if the quadratic growth models fit well. We'll do both variables, in case a quadratic model fits the `{x}` better than the linear model for `{x}`.
+
+Looks like the linear `{x}` fits very well, but not `{y}`. We should check if the quadratic growth models fit well. We'll do both variables, in case a quadratic model fits the `{x}` better than the linear model for `{x}`.\n
+
+As a note: Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; 'quadratic growth' is typically preferred 
 
 ```{r}
 quad_x_mod <- 
@@ -192,11 +199,11 @@ quad_y_fit_stats <- fitmeasures(quad_y_fit, selected_fit_stats)
 quad_y_fit_stats
 ```
 
-#### It's clear that only the `{x}` linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that's the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests. 
+It's clear that only the `{x}` linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that's the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests. 
 
-### Parallel process model 
+# Parallel process model 
 
-#### Now that we are fairly confident in functional forms, let's model them together
+Now that we are fairly confident in functional forms, let's model them together
 ```{r}
 full_model <- 
   '
@@ -230,9 +237,9 @@ full_fit <- growth(model = full_model,
 full_fit_stats <- fitmeasures(full_fit, selected_fit_stats)
 ```
 
-## Full Model Fit
+# Full Model Fit
 
-#### We can see that this model fits well across all fit statistics chosen. This model is deemed acceptable and we can now interpret the model results
+We can see that this model fits well across all fit statistics chosen. This model is deemed acceptable and we can now interpret the model results
 ```{r}
 summary(full_fit,
         stand = T,
@@ -248,21 +255,21 @@ semPlot::semPaths(full_fit, edge.label.cex = .6, what = "std", whatLabels = "std
          curve=2, unCol = "#070b8c", title = T)
 title("Full Model")
 ```
-### Direct Paths / Regressions
-##### The model shows that the variable `{outcome}` is predicted significantly by linear slopes of both `{x}` and `{y}` (i.e., `{sX}` & `{sY}`), as well as the `{qY}`. Baseline levels of both variables (`{iX}` & `{iY}`) did not significantly predict the outcome. 
+# Direct Paths / Regressions
+The model shows that the variable `{outcome}` is predicted significantly by linear slopes of both `{x}` and `{y}` (i.e., `{sX}` & `{sY}`), as well as the `{qY}`. Baseline levels of both variables (`{iX}` & `{iY}`) did not significantly predict the outcome. \n
 
-###  We observed a significant indirect effect from baseline `{iX}` through `{sX}` to the `{outcome}`, which is likely why we do not see a direct effect of `{iX}` on the `{outcome}`. The same process is observed in `{Y}`. There was no indirect effect from `{sY}` to `{qY}` on `{outcome}`
+We observed a significant indirect effect from baseline `{iX}` through `{sX}` to the `{outcome}`, which is likely why we do not see a direct effect of `{iX}` on the `{outcome}`. The same process is observed in `{Y}`. There was no indirect effect from `{sY}` to `{qY}` on `{outcome}`
 
 ### Covariances 
-
+[ADD MATERIAL]
 
 ### Means / Intercepts
 
 # Bootstrapping
 
-## Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.
+Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.
 
-```{r warning=FALSE}
+```{r warning=FALSE, cache = T}
 final_fit_boot<- growth(full_fit, data = sim_growth_dat, estimator = "ML",
                         meanstructure = T,
                         se = "bootstrap",
@@ -275,17 +282,17 @@ parameterEstimates(final_fit_boot,
                    stand = T)[64:66,c(4,5,9,10)]
 ```
 
-## The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call `{summary(full_fit, fit.measures = T)}`, which I didn't do for brevity. 
+The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call `{summary(full_fit, fit.measures = T)}`, which I didn't do for brevity. \n
 
-## furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in `{lavaan}`. As a note, you should *not* trust the p-values from this parameterEstimates() if you go with anything but the default for `boot.ci.type =` if you use any `boot.ci.type` other than `norm`, as that is how the p-value is calculated. You can see a discussion between me & the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).
+Furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in `{lavaan}`. As a note, you should *not* trust the p-values from this parameterEstimates() if you go with anything but the default for `boot.ci.type =` if you use any `boot.ci.type` other than `norm`, as that is how the p-value is calculated. You can see a discussion between me & the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).
 
 
 
-## Plotting
+# Plotting
 
-#### We can plot the growth of these traits, as well with `{ggplot2}`
-#### First we extract factor scores & save this as a data frame, then we can plot.
-##### For a linear model, this is pretty simple:
+We can plot the growth of these traits, as well with `{ggplot2}` \n
+First we extract factor scores & save this as a data frame, then we can plot.\n
+For a linear model, this is pretty simple:
 
 ```{r}
 plot_dat <- lavPredict(full_fit) %>% data.frame()
@@ -307,7 +314,7 @@ scale_y_continuous(name = "X",
 plot_X
 ```
 
-#### For a quadratic model, this is more challenging, but here's some code to do it. First we'll write a function that takes an argument `{y}`, and puts
+For a quadratic model, this is more challenging, but here's some code to do it:
 
 ```{r}
 plot_dat <- lavPredict(full_fit) %>% data.frame()
@@ -361,4 +368,55 @@ plot_Y <- plot_dat_2 %>% ggplot(aes(x = Timepoint,
   theme_minimal() 
 
 plot_Y
+```
+
+# Looking at the simulation call
+
+```{r eval=FALSE}
+
+growth_mod <- 
+  '
+## intercept & slope growth terms for X
+iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
+
+## intercept, slope, & quadratic terms for Y
+iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
+
+## (ignore this for now, we will come back to
+## it during interpretation)
+
+sX ~ 0.45*iX
+sY ~ -0.2*iY
+
+sY ~~ 1*sY
+y4 ~~ 1.2*y4
+
+outcome ~~ 3*outcome
+
+iX + iY ~ 2*1
+sX ~ 1*1
+sY ~ -1*1
+qY ~ -2*1
+
+outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+
+  '
+```
+
+
+In the data I simulated, Variable `{x}` is changing linearly over time and variable `{y}` is changing quadratically. 
+
+
+```{r eval=FALSE}
+sim_growth_dat <- simulateData(model = growth_mod, 
+                               model.type = "growth", 
+                               seed = 82020, 
+                               orthogonal = F,
+                               auto.cov.y = T, 
+                               auto.var = T
+                               )
+
 ```
