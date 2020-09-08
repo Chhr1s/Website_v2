@@ -272,51 +272,7 @@
 <div id="step-0-simulating-data" class="section level1">
 <h1>Step 0: Simulating Data</h1>
 <p>In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default. 
-It was easist to just make data that would fit a parallel process model, with that being our end goal anyways. Specifically, I made two variables which were “collected” across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.). Here’s the code I used to specify the data:</p>
-<pre class="r"><code>growth_mod &lt;- 
-  &#39;
-## intercept &amp; slope growth terms for X
-iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
-sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
-
-## intercept, slope, &amp; quadratic terms for Y
-iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
-sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
-qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
-
-## (ignore this for now, we will come back to
-## it during interpretation)
-
-sX ~ 0.45*iX
-sY ~ -0.2*iY
-
-sY ~~ 1*sY
-y4 ~~ 1.2*y4
-
-outcome ~~ 3*outcome
-
-iX + iY ~ 2*1
-sX ~ 1*1
-sY ~ -1*1
-qY ~ -2*1
-
-outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
-
-  &#39;</code></pre>
-<p>In the data I’m simulateing, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically. Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
-<pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
-                               model.type = &quot;growth&quot;, 
-                               seed = 82020, 
-                               orthogonal = F,
-                               auto.cov.y = T, 
-                               auto.var = T
-                               )#,
-                               # skewness = 0, #Default
-                               # kurtosis = 0, #Default
-                               # return.fit = T,
-                               # meanstructure = T,
-                               # orthogonal = F, 
-                               # standardized = T)</code></pre>
+It was easist to just make data that would fit a parallel process model, with that being our end goal anyways.Specifically, I made two variables which were “collected” across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.). I will share the code I used to simulate the data at the end of the page so you can follow through these steps as if you didn’t know.</p>
 <div id="fit-statistics" class="section level2">
 <h2>Fit statistics</h2>
 <div id="its-good-practice-to-have-a-set-of-fit-statistcs-specified-a-priori-so-you-arent-cherry-picking-good-and-bad-results.-heres-a-spread-of-them-ive-selected" class="section level4">
@@ -422,6 +378,7 @@ linear_y_fit_stats</code></pre>
 ## rmsea.pvalue.scaled    0.0000000
 ## srmr                   1.2678251</code></pre>
 <p>Looks like the linear <code>{x}</code> fits very well, but not <code>{y}</code>. We should check if the quadratic growth models fit well. We’ll do both variables, in case a quadratic model fits the <code>{x}</code> better than the linear model for <code>{x}</code>.</p>
+<p>As a note: Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
 <pre class="r"><code>quad_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -643,6 +600,7 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 <p>We observed a significant indirect effect from baseline <code>{iX}</code> through <code>{sX}</code> to the <code>{outcome}</code>, which is likely why we do not see a direct effect of <code>{iX}</code> on the <code>{outcome}</code>. The same process is observed in <code>{Y}</code>. There was no indirect effect from <code>{sY}</code> to <code>{qY}</code> on <code>{outcome}</code></p>
 <div id="covariances" class="section level3">
 <h3>Covariances</h3>
+<p>[ADD MATERIAL]</p>
 </div>
 <div id="means-intercepts" class="section level3">
 <h3>Means / Intercepts</h3>
@@ -746,6 +704,47 @@ plot_Y &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint,
 plot_Y</code></pre>
 <p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
+<div id="looking-at-the-simulation-call" class="section level1">
+<h1>Looking at the simulation call</h1>
+<pre class="r"><code>growth_mod &lt;- 
+  &#39;
+## intercept &amp; slope growth terms for X
+iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
+
+## intercept, slope, &amp; quadratic terms for Y
+iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
+
+## (ignore this for now, we will come back to
+## it during interpretation)
+
+sX ~ 0.45*iX
+sY ~ -0.2*iY
+
+sY ~~ 1*sY
+y4 ~~ 1.2*y4
+
+outcome ~~ 3*outcome
+
+iX + iY ~ 2*1
+sX ~ 1*1
+sY ~ -1*1
+qY ~ -2*1
+
+outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+
+  &#39;</code></pre>
+<p>In the data I simulated, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically.</p>
+<pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
+                               model.type = &quot;growth&quot;, 
+                               seed = 82020, 
+                               orthogonal = F,
+                               auto.cov.y = T, 
+                               auto.var = T
+                               )</code></pre>
+</div>
 
   
   <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
@@ -807,14 +806,8 @@ plot_Y</code></pre>
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="/post/migrate-from-jekyll/">Migrate to Hugo from Jekyll</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="/post/migrate-from-jekyll/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>
