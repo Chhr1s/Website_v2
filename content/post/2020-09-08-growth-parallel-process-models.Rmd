@@ -112,7 +112,7 @@ selected_fit_stats <-   c("chisq.scaled",
 2. Compare the fit of nested models.
 3. Repeat
 
-Youa can calculate fit on models where the highest term is x^(n-2)
+You can calculate fit on models where the highest term is x^(n-2)
 
 Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).
 
