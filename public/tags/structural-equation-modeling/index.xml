@@ -18,7 +18,7 @@
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/growth-parallel-process-models/</guid>
-      <description>Intro During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!</description>
+      <description>Introduction: The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models.</description>
     </item>
     
   </channel>

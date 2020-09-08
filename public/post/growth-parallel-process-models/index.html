@@ -262,78 +262,50 @@
   
 
 
-<div id="intro" class="section level1">
-<h1>Intro</h1>
-<p>During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don’t know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I’ve ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.</p>
-<div id="note-i-will-expect-you-understand-lavaan-somewhat-or-at-least-can-refer-to-yves-or-others-work-on-syntax.-i-will-give-brief-mentions-to-various-syntax-elements." class="section level4">
-<h4>Note: I will expect you understand lavaan somewhat, or at least can refer to Yves’ (or others’) work on syntax. I will give <em>brief</em> mentions to various syntax elements.</h4>
+<div id="introduction" class="section level1">
+<h1>Introduction:</h1>
+<p>The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. 
+My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, untitl I found <code>{lavaan}</code>. 
+I had to do a <em>lot</em> of reading to figure out how to get versed in both SEM and the package, so I wanted to share a lavaan-specific tutorial in such methods here.
+This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., <a href="https://lavaan.ugent.be/tutorial/growth.html">the growth curve page on the <code>lavaan</code> website</a>) and putting two of these together can be daunting to a new <code>R</code> or <code>lavaan</code> user.
+Think of this more as a tutorial of the steps needed to take when fitting growth models in <code>lavaan</code>, rather than a tutorial solely on either the method or the software.
+As a quick terminology aside: I refer to growth models where 2+ factors are modeled “in parallel over time” as parallel process models (PPMs), but they are sometimes referred to differently. </p>
+<div id="notes" class="section level4">
+<h4>Notes:</h4>
+<ol style="list-style-type: decimal">
+<li><p>Being a SEM method, this assumes some familiarity with SEM, though I hope to present this in a way that is clear to as many people as possible.</p></li>
+<li><p>I expect you to understand or to be able to refer to <a href="https://lavaan.ugent.be/tutorial/index.html"><code>lavaan</code> syntax</a> for basic syntax/interpretation.</p></li>
+<li><p>Consider what I give you the nuts and bolts in how to make this work, and you should refer to other resources for more in depth interpretations.</p></li>
+</ol>
 </div>
 </div>
-<div id="step-0-simulating-data" class="section level1">
-<h1>Step 0: Simulating Data</h1>
-<p>In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default. 
-It was easist to just make data that would fit a parallel process model, with that being our end goal anyways. Specifically, I made two variables which were “collected” across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.). Here’s the code I used to specify the data:</p>
-<pre class="r"><code>growth_mod &lt;- 
-  &#39;
-## intercept &amp; slope growth terms for X
-iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
-sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
-
-## intercept, slope, &amp; quadratic terms for Y
-iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
-sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
-qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
-
-## (ignore this for now, we will come back to
-## it during interpretation)
-
-sX ~ 0.45*iX
-sY ~ -0.2*iY
-
-sY ~~ 1*sY
-y4 ~~ 1.2*y4
-
-outcome ~~ 3*outcome
-
-iX + iY ~ 2*1
-sX ~ 1*1
-sY ~ -1*1
-qY ~ -2*1
-
-outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
-
-  &#39;</code></pre>
-<p>In the data I’m simulateing, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically. Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
-<pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
-                               model.type = &quot;growth&quot;, 
-                               seed = 82020, 
-                               orthogonal = F,
-                               auto.cov.y = T, 
-                               auto.var = T
-                               )#,
-                               # skewness = 0, #Default
-                               # kurtosis = 0, #Default
-                               # return.fit = T,
-                               # meanstructure = T,
-                               # orthogonal = F, 
-                               # standardized = T)</code></pre>
-<div id="fit-statistics" class="section level2">
-<h2>Fit statistics</h2>
-<div id="its-good-practice-to-have-a-set-of-fit-statistcs-specified-a-priori-so-you-arent-cherry-picking-good-and-bad-results.-heres-a-spread-of-them-ive-selected" class="section level4">
-<h4>It’s good practice to have a set of fit statistcs specified <em>a priori</em> so you aren’t cherry picking good and bad results. Here’s a spread of them I’ve selected:</h4>
+<div id="simulating-data-for-demonstration" class="section level1">
+<h1>Simulating Data for Demonstration</h1>
+<p>In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used <code>lavaan</code> to make my data, but other software can do this too. 
+I am reserving the code for this until the end, in case you would like to know how I did that, or if you’re curious to see how closely our PPM approximates the structure of the data we made. 
+Specifically, I made two variables across 4 waves (growth modeling assumes time to be equally spaced). 
+I named the variables x1 = x at time 1, x2 = x at time 2, etc. &amp; y1 = y at time 1, etc.</p>
+</div>
+<div id="fit-statistics" class="section level1">
+<h1>Fit statistics</h1>
+<p>It’s good practice to have a set of fit statistcs specified <em>a priori</em> so you aren’t cherry picking good and bad results. Here’s a spread of them I’ve selected:</p>
 <pre class="r"><code>selected_fit_stats &lt;-   c(&quot;chisq.scaled&quot;,
-                         &quot;pvalue.scaled&quot;,
                          &quot;df.scaled&quot;,
-                         &quot;cfi.scaled&quot;,
-                         &quot;rmsea.scaled&quot;,
-                         &quot;rmsea.pvalue.scaled&quot;,
-                         &quot;srmr&quot;
+                         &quot;pvalue.scaled&quot;, ## ideally n.s.
+                         &quot;cfi.scaled&quot;, ## ideally ≥ 0.95
+                         &quot;rmsea.scaled&quot;, ## ideally ≤ 0.05
+                         &quot;rmsea.pvalue.scaled&quot;, ## ideally n.s.
+                         &quot;srmr&quot; ## ideally &lt; 0.08
                          )</code></pre>
 </div>
-</div>
-</div>
-<div id="assessing-functional-form" class="section level1">
-<h1>Assessing Functional Form</h1>
+<div id="steps-for-a-ppm" class="section level1">
+<h1>Steps for a PPM:</h1>
+<ol style="list-style-type: decimal">
+<li>Assess fit of various models with different functional forms (i.e., no growth, linear growth, quadratic growth, etc.).</li>
+<li>Compare the fit of nested models.</li>
+<li>Repeat</li>
+</ol>
+<p>Youa can calculate fit on models where the highest term is x^(n-2)</p>
 <p>Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).</p>
 <pre class="r"><code>int_x_mod &lt;- 
   &#39;
@@ -350,8 +322,8 @@ int_x_fit &lt;- growth(model = int_x_mod,
 int_x_fit_stats</code></pre>
 <pre><code>##                                .
 ## chisq.scaled        2064.3493976
-## pvalue.scaled          0.0000000
 ## df.scaled              8.0000000
+## pvalue.scaled          0.0000000
 ## cfi.scaled             0.0000000
 ## rmsea.scaled           0.7169988
 ## rmsea.pvalue.scaled    0.0000000
@@ -370,8 +342,8 @@ int_y_fit &lt;- growth(model = int_y_mod,
 int_y_fit_stats</code></pre>
 <pre><code>##                                .
 ## chisq.scaled        3671.5381788
-## pvalue.scaled          0.0000000
 ## df.scaled              8.0000000
+## pvalue.scaled          0.0000000
 ## cfi.scaled             0.0000000
 ## rmsea.scaled           0.9570186
 ## rmsea.pvalue.scaled    0.0000000
@@ -392,8 +364,8 @@ linear_x_fit_stats&lt;-fitmeasures(linear_x_fit, selected_fit_stats) %&gt;% data
 linear_x_fit_stats</code></pre>
 <pre><code>##                              .
 ## chisq.scaled        5.49443372
-## pvalue.scaled       0.35855663
 ## df.scaled           5.00000000
+## pvalue.scaled       0.35855663
 ## cfi.scaled          0.99969401
 ## rmsea.scaled        0.01406320
 ## rmsea.pvalue.scaled 0.84594503
@@ -415,13 +387,14 @@ linear_y_fit &lt;- growth(model = linear_y_mod,
 linear_y_fit_stats</code></pre>
 <pre><code>##                                .
 ## chisq.scaled        1181.3526239
-## pvalue.scaled          0.0000000
 ## df.scaled              5.0000000
+## pvalue.scaled          0.0000000
 ## cfi.scaled             0.2720970
 ## rmsea.scaled           0.6859599
 ## rmsea.pvalue.scaled    0.0000000
 ## srmr                   1.2678251</code></pre>
 <p>Looks like the linear <code>{x}</code> fits very well, but not <code>{y}</code>. We should check if the quadratic growth models fit well. We’ll do both variables, in case a quadratic model fits the <code>{x}</code> better than the linear model for <code>{x}</code>.</p>
+<p>As a note: Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
 <pre class="r"><code>quad_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -437,8 +410,8 @@ quad_x_fit &lt;- growth(model = quad_x_mod,
 
 quad_x_fit_stats &lt;- fitmeasures(quad_x_fit, selected_fit_stats)
 quad_x_fit_stats</code></pre>
-<pre><code>##        chisq.scaled       pvalue.scaled           df.scaled          cfi.scaled 
-##               0.429               0.512               1.000               1.000 
+<pre><code>##        chisq.scaled           df.scaled       pvalue.scaled          cfi.scaled 
+##               0.429               1.000               0.512               1.000 
 ##        rmsea.scaled rmsea.pvalue.scaled                srmr 
 ##               0.000               0.717               0.003</code></pre>
 <pre class="r"><code>quad_y_mod &lt;- 
@@ -456,8 +429,8 @@ quad_y_fit &lt;- growth(model = quad_y_mod,
 
 quad_y_fit_stats &lt;- fitmeasures(quad_y_fit, selected_fit_stats)
 quad_y_fit_stats</code></pre>
-<pre><code>##        chisq.scaled       pvalue.scaled           df.scaled          cfi.scaled 
-##               0.007               0.932               1.000               1.000 
+<pre><code>##        chisq.scaled           df.scaled       pvalue.scaled          cfi.scaled 
+##               0.007               1.000               0.932               1.000 
 ##        rmsea.scaled rmsea.pvalue.scaled                srmr 
 ##               0.000               0.963               0.000</code></pre>
 <p>It’s clear that only the <code>{x}</code> linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that’s the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests.</p>
@@ -633,9 +606,15 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 ##     iX_sX_outcome     0.979    0.236    4.141    0.000    1.026    0.236
 ##     iY_sY_outcome    -0.845    0.259   -3.259    0.001   -0.907   -0.208
 ##     sY_qY_outcome    -0.315    0.208   -1.515    0.130   -0.373   -0.086</code></pre>
-<div id="diagram" class="section level2">
-<h2>Diagram</h2>
-</div>
+<pre class="r"><code># lavaanPlot(model = full_fit, coefs = T, stars = T,
+#            covs = T)
+# edge.label.cex = .6, what = &quot;std&quot;, whatLabels = &quot;std&quot;,
+#          label.prop=0.9, edge.label.color = &quot;black&quot;, rotation = 1, #layout = &quot;circle&quot;,
+#          equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
+#          edge.width = 0.5, shapeMan = &quot;rectangle&quot;, shapeLat = &quot;ellipse&quot;, intercepts = F, #structural = T,
+#          shapeInt = &quot;triangle&quot;, sizeMan = 4, sizeInt = 2, sizeLat = 4, 
+#          curve=2, unCol = &quot;#070b8c&quot;, title = T)
+# title(&quot;Full Model&quot;)</code></pre>
 </div>
 <div id="direct-paths-regressions" class="section level1">
 <h1>Direct Paths / Regressions</h1>
@@ -643,6 +622,7 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 <p>We observed a significant indirect effect from baseline <code>{iX}</code> through <code>{sX}</code> to the <code>{outcome}</code>, which is likely why we do not see a direct effect of <code>{iX}</code> on the <code>{outcome}</code>. The same process is observed in <code>{Y}</code>. There was no indirect effect from <code>{sY}</code> to <code>{qY}</code> on <code>{outcome}</code></p>
 <div id="covariances" class="section level3">
 <h3>Covariances</h3>
+<p>[ADD MATERIAL]</p>
 </div>
 <div id="means-intercepts" class="section level3">
 <h3>Means / Intercepts</h3>
@@ -746,6 +726,47 @@ plot_Y &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint,
 plot_Y</code></pre>
 <p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
+<div id="looking-at-the-simulation-call" class="section level1">
+<h1>Looking at the simulation call</h1>
+<pre class="r"><code>growth_mod &lt;- 
+  &#39;
+## intercept &amp; slope growth terms for X
+iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
+
+## intercept, slope, &amp; quadratic terms for Y
+iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
+
+## (ignore this for now, we will come back to
+## it during interpretation)
+
+sX ~ 0.45*iX
+sY ~ -0.2*iY
+
+sY ~~ 1*sY
+y4 ~~ 1.2*y4
+
+outcome ~~ 3*outcome
+
+iX + iY ~ 2*1
+sX ~ 1*1
+sY ~ -1*1
+qY ~ -2*1
+
+outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+
+  &#39;</code></pre>
+<p>In the data I simulated, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically.</p>
+<pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
+                               model.type = &quot;growth&quot;, 
+                               seed = 82020, 
+                               orthogonal = F,
+                               auto.cov.y = T, 
+                               auto.var = T
+                               )</code></pre>
+</div>
 
   
   <h4><i class="fa-share-alt" aria-hidden="true"></i>&nbsp;Share!</h4>
@@ -807,14 +828,8 @@ plot_Y</code></pre>
   </div>
   <div class="pure-u-10-24">
     
-    <nav class="next">
-      <a href="/post/migrate-from-jekyll/">Migrate to Hugo from Jekyll</a>
-    </nav>
-    
   </div>
   <div class="pure-u-1-24" style="text-align: right;">
-    
-    <a href="/post/migrate-from-jekyll/"><i class="fa fa-chevron-right"></i></a>
     
   </div>
 </div>

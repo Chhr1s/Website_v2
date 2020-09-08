@@ -17,17 +17,31 @@ library(lavaan)
 library(semPlot)
 library(ggplot2)
 library(tidyverse)
+library(lavaanPlot)
 ```
-# Intro 
+# Introduction: 
 
-During my MS, I worked on a few manuscripts which used growth modeling. These topics are well supported, but sometimes the support is hard to find if you don't know where to look. After subscribing to the lavaan support Google Group, I saw many people requesting growth model and/or parallel process model support. I responded back to people a few times, but I figured it was just better to put a perminant link up showing the steps that can be used to fit, compare, and interpret growth models in lavaan (one of my favorite statistical packages/software I've ever used!). Consider what I give you the nuts and bolts, and you should refer to other resources for more in depth interpretations.
+The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn't answer with the methods I knew. \n
+My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, untitl I found `{lavaan}`. \n
+I had to do a *lot* of reading to figure out how to get versed in both SEM and the package, so I wanted to share a lavaan-specific tutorial in such methods here.\n
+This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., [the growth curve page on the `lavaan` website](https://lavaan.ugent.be/tutorial/growth.html)) and putting two of these together can be daunting to a new `R` or `lavaan` user.\n
+Think of this more as a tutorial of the steps needed to take when fitting growth models in `lavaan`, rather than a tutorial solely on either the method or the software.\n
+As a quick terminology aside: I refer to growth models where 2+ factors are modeled "in parallel over time" as parallel process models (PPMs), but they are sometimes referred to differently. \n
 
-#### Note: I will expect you understand lavaan somewhat, or at least can refer to Yves' (or others') work on syntax. I will give *brief* mentions to various syntax elements.
+#### Notes: 
 
-# Step 0: Simulating Data
+1. Being a SEM method, this assumes some familiarity with SEM, though I hope to present this in a way that is clear to as many people as possible.
 
-In order to complete this project, I simulated some data. For simplicity, I actually used lavaan which gives me 500 observations by default. \n
-It was easist to just make data that would fit a parallel process model, with that being our end goal anyways.\n Specifically, I made two variables which were "collected" across 4 waves (assumed to be equal in distance; x1 = x at time 1, x2 = x at time 2, etc.).  I will share the code I used to simulate the data at the end of the page so you can follow through these steps as if you didn't know. 
+2. I expect you to understand or to be able to refer to [`lavaan` syntax](https://lavaan.ugent.be/tutorial/index.html) for basic syntax/interpretation.
+
+3. Consider what I give you the nuts and bolts in how to make this work, and you should refer to other resources for more in depth interpretations. 
+
+# Simulating Data for Demonstration
+
+In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used `lavaan` to make my data, but other software can do this too. \n
+I am reserving the code for this until the end, in case you would like to know how I did that, or if you're curious to see how closely our PPM approximates the structure of the data we made. \n
+Specifically, I made two variables across 4 waves (growth modeling assumes time to be equally spaced). \n
+I named the variables x1 = x at time 1, x2 = x at time 2, etc. & y1 = y at time 1, etc.
 
 ```{r include=FALSE}
 
@@ -63,7 +77,6 @@ outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
   '
 ```
 
-
 ```{r include=FALSE}
 sim_growth_dat <- simulateData(model = growth_mod, 
                                model.type = "growth", 
@@ -80,20 +93,26 @@ sim_growth_dat <- simulateData(model = growth_mod,
                                # standardized = T)
 
 ```
-## Fit statistics
+# Fit statistics
 
-#### It's good practice to have a set of fit statistcs specified *a priori* so you aren't cherry picking good and bad results. Here's a spread of them I've selected:
+It's good practice to have a set of fit statistcs specified *a priori* so you aren't cherry picking good and bad results. Here's a spread of them I've selected:
 ```{r}
 selected_fit_stats <-   c("chisq.scaled",
-                         "pvalue.scaled",
                          "df.scaled",
-                         "cfi.scaled",
-                         "rmsea.scaled",
-                         "rmsea.pvalue.scaled",
-                         "srmr"
+                         "pvalue.scaled", ## ideally n.s.
+                         "cfi.scaled", ## ideally ≥ 0.95
+                         "rmsea.scaled", ## ideally ≤ 0.05
+                         "rmsea.pvalue.scaled", ## ideally n.s.
+                         "srmr" ## ideally < 0.08
                          )
 ```
-# Assessing Functional Form 
+# Steps for a PPM:
+
+1. Assess fit of various models with different functional forms (i.e., no growth, linear growth, quadratic growth, etc.). 
+2. Compare the fit of nested models.
+3. Repeat
+
+Youa can calculate fit on models where the highest term is x^(n-2)
 
 Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).
 
@@ -245,15 +264,17 @@ summary(full_fit,
         stand = T,
         rsq = T)
 ```
-## Diagram
-```{r eval=FALSE, include=FALSE}
-semPlot::semPaths(full_fit, edge.label.cex = .6, what = "std", whatLabels = "std",
-         label.prop=0.9, edge.label.color = "black", rotation = 1, #layout = "circle",
-         equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
-         edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", intercepts = F, #structural = T,
-         shapeInt = "triangle", sizeMan = 4, sizeInt = 2, sizeLat = 4, 
-         curve=2, unCol = "#070b8c", title = T)
-title("Full Model")
+
+```{r eval=T, include=T}
+# lavaanPlot(model = full_fit, coefs = T, stars = T,
+#            covs = T)
+# edge.label.cex = .6, what = "std", whatLabels = "std",
+#          label.prop=0.9, edge.label.color = "black", rotation = 1, #layout = "circle",
+#          equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
+#          edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", intercepts = F, #structural = T,
+#          shapeInt = "triangle", sizeMan = 4, sizeInt = 2, sizeLat = 4, 
+#          curve=2, unCol = "#070b8c", title = T)
+# title("Full Model")
 ```
 # Direct Paths / Regressions
 The model shows that the variable `{outcome}` is predicted significantly by linear slopes of both `{x}` and `{y}` (i.e., `{sX}` & `{sY}`), as well as the `{qY}`. Baseline levels of both variables (`{iX}` & `{iY}`) did not significantly predict the outcome. \n
