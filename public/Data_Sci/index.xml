@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Data_Scis on Christopher Loan</title>
+    <link>/data_sci/</link>
+    <description>Recent content in Data_Scis on Christopher Loan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2020. All rights reserved.</copyright>
+    <lastBuildDate>Tue, 02 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/data_sci/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Tidymodels: Decision Tree Learning in R</title>
+      <link>/data_sci/decision_trees_in_r/</link>
+      <pubDate>Tue, 02 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/data_sci/decision_trees_in_r/</guid>
+      <description>Intro Tidyverse’s newest release has recently come together to form a cohesive suite of packages for modeling and machine learning, called {tidymodels}. The successor to Max Kuhn’s {caret} package, {tidymodels} allows for a tidy approach to your data from start to finish. We’re going to walk through the basics for getting off the ground with {tidymodels} and demonstrate its application to three different tree-based methods for predicting student test scores.</description>
+    </item>
+    
+  </channel>
+</rss>
