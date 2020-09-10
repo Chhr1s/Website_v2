@@ -12,41 +12,45 @@ description: ''
 topics: []
 ---
 
-```{r setup, include=FALSE}
+```{r message=FALSE, warning=FALSE, include=T}
 library(lavaan)
-library(semPlot)
 library(ggplot2)
 library(tidyverse)
-library(lavaanPlot)
 ```
 # Introduction: 
 
-The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn't answer with the methods I knew. \n
-My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, untitl I found `{lavaan}`. \n
-I had to do a *lot* of reading to figure out how to get versed in both SEM and the package, so I wanted to share a lavaan-specific tutorial in such methods here.\n
-This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., [the growth curve page on the `lavaan` website](https://lavaan.ugent.be/tutorial/growth.html)) and putting two of these together can be daunting to a new `R` or `lavaan` user.\n
-Think of this more as a tutorial of the steps needed to take when fitting growth models in `lavaan`, rather than a tutorial solely on either the method or the software.\n
+The first research project I worked on in graduate school was a secondary data analysis on a longitudinal study. I developed some research questions and dove in. I looked for wave-to-wave changes in various constructs of interest to me. Quickly, though, I began asking questions about the growth and change of dynamic factors that I couldn't answer with the methods I knew. \n
+
+One P.I. directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, then I found `{lavaan}`. \n
+
+I had to do a *lot* of reading to figure out how to get versed in both SEM and the package to answer these questions, so I wanted to share a lavaan-specific tutorial in such methods here.\n
+
+This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., [the growth curve page on the `{lavaan}` website](https://lavaan.ugent.be/tutorial/growth.html)) and putting two of these together can be daunting to a new `{R}` or `{lavaan}` user.\n
+
+Think of this more as a tutorial of the steps needed to take when fitting growth models in `{lavaan}`, rather than a tutorial solely on either the method or the software.\n
+
 As a quick terminology aside: I refer to growth models where 2+ factors are modeled "in parallel over time" as parallel process models (PPMs), but they are sometimes referred to differently. \n
 
-#### Notes: 
+##### NOTES: 
 
 1. Being a SEM method, this assumes some familiarity with SEM, though I hope to present this in a way that is clear to as many people as possible.
 
-2. I expect you to understand or to be able to refer to [`lavaan` syntax](https://lavaan.ugent.be/tutorial/index.html) for basic syntax/interpretation.
+2. I expect you to understand or to be able to refer to [`{lavaan}` syntax](https://lavaan.ugent.be/tutorial/index.html) for basic syntax/interpretation.
 
 3. Consider what I give you the nuts and bolts in how to make this work, and you should refer to other resources for more in depth interpretations. 
 
 # Simulating Data for Demonstration
 
-In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used `lavaan` to make my data, but other software can do this too. \n
+In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used `{lavaan}` to make my data, but other software can do this too. \n
 I am reserving the code for this until the end, in case you would like to know how I did that, or if you're curious to see how closely our PPM approximates the structure of the data we made. \n
 Specifically, I made two variables across 4 waves (growth modeling assumes time to be equally spaced). \n
-I named the variables x1 = x at time 1, x2 = x at time 2, etc. & y1 = y at time 1, etc.
+I named the variables `{x1}` =`{x}`at time 1, `{x2}` = `{x}` at time 2, etc. & `{y1}` = `{y}` at time 1, etc.
 
 ```{r include=FALSE}
 
 growth_mod <- 
   '
+
 ## intercept & slope growth terms for X
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
 sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
@@ -56,24 +60,20 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
 sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
 qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
 
-## (ignore this for now, we will come back to
-## it during interpretation)
+# ## set variances 
 
-sX ~ 0.45*iX
-sY ~ -0.2*iY
+y4 ~~ 2*y4
+x4 ~~ 1*x4
 
-sY ~~ 1*sY
-y4 ~~ 1.2*y4
-
-outcome ~~ 3*outcome
-
-iX + iY ~ 2*1
+## set intercepts
+iX ~ 2*1
 sX ~ 1*1
 sY ~ -1*1
-qY ~ -2*1
+qY ~ -1.5*1
 
-outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+sY ~ 2*predictor
 
+outcome ~ 2*iX + 3*sY 
   '
 ```
 
@@ -84,21 +84,18 @@ sim_growth_dat <- simulateData(model = growth_mod,
                                orthogonal = F,
                                auto.cov.y = T, 
                                auto.var = T
-                               )#,
-                               # skewness = 0, #Default
-                               # kurtosis = 0, #Default
-                               # return.fit	= T,
-                               # meanstructure = T,
-                               # orthogonal = F, 
-                               # standardized = T)
+                               )
 
 ```
 # Fit statistics
 
-It's good practice to have a set of fit statistcs specified *a priori* so you aren't cherry picking good and bad results. Here's a spread of them I've selected:
+In SEM, goodness-of-fit testing is not free; you need degrees of freedom. Specifically, you can calculate fit on models where the highest term is `{x^(n-2)}` where `{n}` is the number of waves you have. I wanted to show a quadratic fitting process, so I included 4 waves (i.e., x^(4-2) = x^2-order models can be assessed for fit).
+
+It's good practice to have a set of fit statistcs specified *a priori* so you aren't cherry picking good and bad results. Here's a spread of them I've selected, along with ideal levels of fit (commented out).
+
 ```{r}
 selected_fit_stats <-   c("chisq.scaled",
-                         "df.scaled",
+                         "df.scaled", ## must be >0 to test G.O.F.
                          "pvalue.scaled", ## ideally n.s.
                          "cfi.scaled", ## ideally ≥ 0.95
                          "rmsea.scaled", ## ideally ≤ 0.05
@@ -108,13 +105,84 @@ selected_fit_stats <-   c("chisq.scaled",
 ```
 # Steps for a PPM:
 
-1. Assess fit of various models with different functional forms (i.e., no growth, linear growth, quadratic growth, etc.). 
-2. Compare the fit of nested models.
-3. Repeat
+1. Plot your data 
+2. Assess fit of various models for both variables (i.e., no growth, linear growth, quadratic growth, etc.). 
+3. Combine individual ideal models
+4. Assess fit (& modify syntax, typically, but that is nuanced & beyond our scope)
+5. Plot the predicted data & compare to step 1
 
-You can calculate fit on models where the highest term is x^(n-2)
+# STEP 1. Plot your data
 
-Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).
+This should give you a guess at what forms probably will fit. I did some work in `{tidyr}` to move the data around, then plotted in `{ggplot2}`, where we can see individual trajectories for each construct over time.\n 
+I set the `alpha` parameter very low (0.2) so lines are transparent and we can get at density of distribution. 
+
+```{r}
+sim_growth_dat$participant_n <- 1:nrow(sim_growth_dat) #add participant number
+
+x_plot <-
+pivot_longer(sim_growth_dat, 
+             cols = x1:x4, 
+             names_to = 'x',
+             names_prefix = 'x')
+
+individual_x_trajectories <- 
+  ggplot(x_plot, aes(x = as.numeric(x), y = value, 
+                   group = participant_n, 
+                   color = participant_n))+
+  geom_line(alpha = 0.2) +
+  ggtitle('individual trajectories of x') +
+  xlab('Timepoint')+
+  ylab('x')+
+  theme_classic() + xlim(1,4)
+
+individual_x_trajectories
+
+```
+
+You can see that the `{x}` variable is probably linearly increasing, but a very "shallow" quadratic model might fit better so we should check if it fits well. If both fit well, we will compare them with likelihood ratio tests (LRTs).
+
+```{r}
+y_plot <-
+pivot_longer(sim_growth_dat, 
+             cols = y1:y4, 
+             names_to = 'y',
+             names_prefix = 'y')
+
+individual_y_trajectories <- 
+  ggplot(y_plot, aes(x = as.numeric(y), y = value, 
+                   group = participant_n, 
+                   color = participant_n)) + 
+  geom_line(alpha = 0.2) +
+  ggtitle('individual trajectories of y') +
+  xlab('Timepoint')+
+  ylab('y')+
+  theme_classic()+xlim(1,4)
+individual_y_trajectories
+```
+
+It is clear that `{y}` decreases with time on average, but there is heterogeneity (or variability) in what happens for an individual case. It looks like a either a linear or quadratic model will fit best. \n
+
+Let's dive in!
+
+# STEP 2. Assess fit of various models 
+
+Time to first fit the model to an intercept-only model (i.e., no growth observed).\n
+
+Next, we'll look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept). We won't go higher than that because we cannot assess fit with only 4 waves.\n
+
+There are lots of nuances here, but I discuss some common choices here.
+
+### Function
+
+The `growth()` call in `{lavaan}` is an easy way to specify a growth model. By default, it sets means/intercepts of observed variables to 0 and determines mean structure for latent variables.\n
+
+### Estimator
+
+All data used here is continuous, so we'll stick with maximum likelihood (`estimator = ML`) estimation, and I prefer to use the "robust" variant (`estimator = MLR`) whenever possible to account for non-normal data. \n
+
+### Missingness
+
+For simplicity, there is no missingness in this data. If there were, we could do Little's Test of Missing data and see patterns of missingness. Assuming data was missing (completely) at random and we didn't have too much missingness, we could use Full-information Maximum Likelihood to impute missing data. \n
 
 ```{r}
 int_x_mod <- 
@@ -124,12 +192,13 @@ iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
   '
 int_x_fit <- growth(model = int_x_mod,
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 int_x_fit_stats<-fitmeasures(int_x_fit, selected_fit_stats) %>% data.frame()
-int_x_fit_stats
+round(int_x_fit_stats, 2)
 ```
+
+The no growth model for `{x}` does not fit well by any measure. So we'll move on.
 
 ```{r}
 int_y_mod <- 
@@ -138,14 +207,14 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
   '
 int_y_fit <- growth(model = int_y_mod, 
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 int_y_fit_stats<-fitmeasures(int_y_fit, selected_fit_stats) %>% data.frame()
-int_y_fit_stats
+round(int_y_fit_stats, 2)
 ```
 
-Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the `{x}` & `{y}` variables
+The no growth model for `{y}` does not fit well by any measure either. \n
+Next, we will check how well a linear-only growth model fits for the `{x}` & `{y}` variables
 
 ```{r}
 linear_x_mod <- 
@@ -156,12 +225,14 @@ sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
   '
 linear_x_fit <- growth(model = linear_x_mod,
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 linear_x_fit_stats<-fitmeasures(linear_x_fit, selected_fit_stats) %>% data.frame()
-linear_x_fit_stats
+round(linear_x_fit_stats, 2)
 ```
+
+The linear growth model for `{x}` fits well by all measures. This is what we expected based on the graph of observed data. We should test quadratic models for fit, though. 
+
 
 ```{r}
 linear_y_mod <- 
@@ -171,16 +242,17 @@ sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
   '
 linear_y_fit <- growth(model = linear_y_mod,
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 linear_y_fit_stats<-fitmeasures(linear_y_fit, selected_fit_stats) %>% data.frame()
-linear_y_fit_stats
+round(linear_y_fit_stats, 2)
 ```
 
-Looks like the linear `{x}` fits very well, but not `{y}`. We should check if the quadratic growth models fit well. We'll do both variables, in case a quadratic model fits the `{x}` better than the linear model for `{x}`.\n
+Looks like the linear `{y}` is inadequate acrross all measures. \n
 
-As a note: Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; 'quadratic growth' is typically preferred 
+##### NOTE: 
+
+Quadratic terms represent the average rate of change of the slope across waves. This is synonymous with acceleration in other disciplines, though this terminology is not often used and 'quadratic growth' is typically preferred in SEM.
 
 ```{r}
 quad_x_mod <- 
@@ -193,12 +265,36 @@ qX =~ 0*x1 + 1*x2 + 4*x3 + 9*x4
   '
 quad_x_fit <- growth(model = quad_x_mod, 
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 quad_x_fit_stats <- fitmeasures(quad_x_fit, selected_fit_stats)
-quad_x_fit_stats
+round(quad_x_fit_stats, 2)
+
 ```
+
+Here we have an interesting issue, as `{x}` fits fairly well to both a linear & a quadratic model, but we have a Heywood case, specifically the estimated observed variable variance is negative. Let's inspect \n
+
+```{r}
+lavInspect(quad_x_fit, "est")$theta
+```
+
+Our `{x4}` variable has a negative estimate for the observed variable's variance. This is a problem, and indicates the model may not represent the data well. There are ways to use parameter constraints to see if the fit is good if we "force" a change to this parameter, but that's beyond our scope today.
+
+For teaching purposes, we'll pretend we didn't have a Heywood case to do the next step.\n
+
+When you have two well-fitting nested models (in our case linear & quadratic models), we can compare the fit formally with Likelihood Ratio Tests (LRTs). The null hypothesis is essentially that there is no difference in the variance explained by the two models. Parsimony is preferred in a situation where the variance explained is equivalent.  \n
+
+##### NOTE:
+
+Some will say this test is only valid if the models have n.s. p-values and there are no Heywood cases.
+
+```{r}
+lavTestLRT(linear_x_fit, quad_x_fit)
+```
+
+Here, a non-significant p-value tells us that the linear model is preferred here. \n
+
+Now onto the quadratic `{y}` model.
 
 ```{r}
 quad_y_mod <- 
@@ -211,18 +307,24 @@ qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
   '
 quad_y_fit <- growth(model = quad_y_mod, 
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 quad_y_fit_stats <- fitmeasures(quad_y_fit, selected_fit_stats)
 quad_y_fit_stats
+
 ```
 
-It's clear that only the `{x}` linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that's the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests. 
+It's clear that only the `{x}` linear model was a good one by all fit statistics. We could actually easily see this earlier in Step 1, but it is good that we checked. \n
 
-# Parallel process model 
+When using real—world data this may or may not be the case; I simulated this data specifically to be clean linear and quadratic models for `{x}` & `{y}` respectively. \n
 
-Now that we are fairly confident in functional forms, let's model them together
+# STEP 3. Building the PPM
+
+Now that we are fairly confident in functional forms, let's model them together. \n
+
+##### NOTE: 
+
+For simplicity we are *not* specifying conditional models which make future growth terms conditional upon earlier growth terms. The distinction between the two is subtle and deserves its own conversation later. For now, just assume growth terms are simply correlated, rather than causally linked.
 ```{r}
 full_model <- 
   '
@@ -235,25 +337,24 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
 sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
 qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
 
-sX ~ a1*iX + iY
-sY ~ iX + a2*iY
-qY ~ a3*sY + sX + iX + iY 
+## regress growth terms on predictor
+qY + iY + sX + iX ~ predictor
+sY ~ a1*predictor
 
-sY ~~ sX
-iY ~~ iX
+## regress outcome on growth terms
+outcome ~ iX + sX + iY + b1*sY + qY
 
-outcome ~ iX + b1*sX + iY + b2*sY + b3*qY
+## testing indirect effect 
+## predictor --> sY --> outcome
 
-iX_sX_outcome := a1*b1
-iY_sY_outcome := a2*b2
-sY_qY_outcome := a3*b3
+predictor_sY_outcome:=a1*b1
   '
 
 full_fit <- growth(model = full_model, 
                      estimator = 'MLR',
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 full_fit_stats <- fitmeasures(full_fit, selected_fit_stats)
+round(full_fit_stats,2) 
 ```
 
 # Full Model Fit
@@ -265,30 +366,17 @@ summary(full_fit,
         rsq = T)
 ```
 
-```{r eval=T, include=T}
-# lavaanPlot(model = full_fit, coefs = T, stars = T,
-#            covs = T)
-# edge.label.cex = .6, what = "std", whatLabels = "std",
-#          label.prop=0.9, edge.label.color = "black", rotation = 1, #layout = "circle",
-#          equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
-#          edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", intercepts = F, #structural = T,
-#          shapeInt = "triangle", sizeMan = 4, sizeInt = 2, sizeLat = 4, 
-#          curve=2, unCol = "#070b8c", title = T)
-# title("Full Model")
-```
-# Direct Paths / Regressions
-The model shows that the variable `{outcome}` is predicted significantly by linear slopes of both `{x}` and `{y}` (i.e., `{sX}` & `{sY}`), as well as the `{qY}`. Baseline levels of both variables (`{iX}` & `{iY}`) did not significantly predict the outcome. \n
+# Interpretation
 
-We observed a significant indirect effect from baseline `{iX}` through `{sX}` to the `{outcome}`, which is likely why we do not see a direct effect of `{iX}` on the `{outcome}`. The same process is observed in `{Y}`. There was no indirect effect from `{sY}` to `{qY}` on `{outcome}`
+I am going to trust you understand how to read `{lavaan}` here, so I'm not going to walk through this line by line. The headlines are `{iX}` & `{sY}` significantly predict `{outcome}`, with the latter predicting it to a much larger degree than the former. \n
 
-### Covariances 
-[ADD MATERIAL]
+This means baseline levels of `{x}` predict outcome, as does the linear rate of change of `{y}`, both positively such that higher levels of initial `{x}` or faster rates of change in `{y}` lead to higher levels of `{outcome}`.\n 
 
-### Means / Intercepts
+In our example, I included a time-invariant covariate `{predictor}`. Since `{predictor}` significantly predicted `{sY}` and `{sY}` predicted `{outcome}`, we would want to look for mediation. You may trust the estimate given by simply the product of each coefficient and it's significance test, but it is better to rely on other methods to test indirect effects.
 
 # Bootstrapping
 
-Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.
+Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic more deeply than this post, but I used this to test the indirect effects using 5000 simulated data sets.
 
 ```{r warning=FALSE, cache = T}
 final_fit_boot<- growth(full_fit, data = sim_growth_dat, estimator = "ML",
@@ -300,45 +388,63 @@ final_fit_boot<- growth(full_fit, data = sim_growth_dat, estimator = "ML",
 parameterEstimates(final_fit_boot,
                    level = .95,
                    boot.ci.type = "bca.simple",
-                   stand = T)[64:66,c(4,5,9,10)]
+                   stand = T)[61,c(4,5,9,10)]
 ```
 
-The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call `{summary(full_fit, fit.measures = T)}`, which I didn't do for brevity. \n
+The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call `{summary(full_fit, fit = T)}`, which I didn't do for brevity. \n
 
-Furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in `{lavaan}`. As a note, you should *not* trust the p-values from this parameterEstimates() if you go with anything but the default for `boot.ci.type =` if you use any `boot.ci.type` other than `norm`, as that is how the p-value is calculated. You can see a discussion between me & the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).
+Furthermore, looking at the 95% confidence intervals, we find the same result as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used `bca.simple`. \n
 
+Most likely this is what we wanted to do with this model (at least in my field). Assess if a predictor influences growth in a construct, then see if there is an indirect effect (and quanitify its magnitude).
 
+##### NOTE: 
+
+I made it so only the label, unstandardized estimate and confidence intervals showed up with the `[61,c(4,5,9,10)]` portion of code, but you should *not* trust the p-values from this parameterEstimates() if you go with *anything but the default* (i.e., `boot.ci.type = norm`). \n 
+This is because the p-value is built assuming a normal distribution; this eliminates some of the benefits of bootstrapping gained by `bca.simple` and other methods, but gives you a p-value, which matters a lot to some.\n
 
 # Plotting
 
-We can plot the growth of these traits, as well with `{ggplot2}` \n
+We can plot the growth of these traits, as well with `{ggplot2}`, which helps verify you did this correctly. I won't go into it here, but these plots can be modified with facet wrapping and other grouping/coloring methods to see how different groups have different slopes, for example. \n
+
 First we extract factor scores & save this as a data frame, then we can plot.\n
 For a linear model, this is pretty simple:
 
 ```{r}
 plot_dat <- lavPredict(full_fit) %>% data.frame()
+plot_dat$participant_n <- 1:nrow(plot_dat)
+plot_dat$predictor <- sim_growth_dat$predictor
 
-plot_X <- ggplot(data=plot_dat) +
+
+predicted_x_trajectories <- ggplot(data=plot_dat) +
 scale_x_continuous(name = "Timepoint",
-                 limits=c(0,3),
+                 limits=c(0, 3),
                  breaks = c(0, 1, 2, 3),
                  labels = c('1', '2', '3', '4')
                  ) +
-scale_y_continuous(name = "X",
-                 limits=c(0,30)
+scale_y_continuous(name = "x",
+                 limits=c(-5,15)
                  )+
   geom_abline(data=plot_dat, 
               mapping=aes(slope=sX, 
-                          intercept=iX), 
-              color = "lightblue") + 
-  theme_minimal()
-plot_X
+                          intercept=iX, 
+                          color = participant_n),
+              alpha = 0.2) + 
+  theme_classic() + ggtitle('predicted x trajectories') 
+
+```
+
+With this call, I can stack the actual and predicted trajectory graphs:
+
+```{r}
+gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)
 ```
 
 For a quadratic model, this is more challenging, but here's some code to do it:
 
 ```{r}
 plot_dat <- lavPredict(full_fit) %>% data.frame()
+plot_dat$participant_n <- 1:nrow(plot_dat)
+plot_dat$predictor <- sim_growth_dat$predictor
 
 qY <- plot_dat$qY
 sY <- plot_dat$sY
@@ -347,8 +453,6 @@ iY <- plot_dat$iY
 test <- function(y) {qY*y ^ 2 + sY*y + iY}
 
 
-
-nrow(plot_dat)
 plot_dat_2<-data.frame(`T1` = test(0), 
                        `T2` = test(1), 
                        `T3` = test(2), 
@@ -375,28 +479,42 @@ df_long_wave <- matrix(c(rep(1,500),
                       ncol = 1)
 
 
-plot_dat_2 <- data.frame(id = matrix(
-  rep(1:500,4), ncol = 1),
+plot_dat_2 <- data.frame(
+  participant_n = matrix(
+    rep(1:500,4), ncol = 1),
   Timepoint = df_long_wave,
-  Y = Y_df)
+  y = Y_df)
 
-
-plot_Y <- plot_dat_2 %>% ggplot(aes(x = Timepoint, 
-                          y = Y, 
-                          group = id)) +
+predicted_y_trajectories <- plot_dat_2 %>% ggplot(aes(x = Timepoint, 
+                          y = y, 
+                          group = participant_n, 
+                          color = participant_n), 
+                          alpha = 0.2) +
  geom_smooth(formula = y ~ x + I(x^2), 
              method = "lm", se = F)+
-  theme_minimal() 
-
-plot_Y
+  theme_classic() + ggtitle('predicted trajectories of y')
 ```
 
+Again, let's stack the actual and predicted trajectory graphs:
+
+```{r}
+gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)
+```
+
+# Next Steps:
+
+If you were to be working on this, I would work further to make the model more parsimoneous, as well as seeing if alternate modifications would increase model fit.\n
+Ways to do this include, but are not limited to, constraining residuals, assessing the role of the predictor on the observed vs. manifest model, making the growth terms conditional upon earlier terms, etc.\n
+
 # Looking at the simulation call
+
+Here is the exact simulation call I did in case anyone is curious. I wanted the data to be interesting, so I made sure to set some things (e.g., variances, latent means/intercepts, relationships between variables, etc.)
 
 ```{r eval=FALSE}
 
 growth_mod <- 
   '
+
 ## intercept & slope growth terms for X
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
 sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
@@ -406,30 +524,24 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
 sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
 qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
 
-## (ignore this for now, we will come back to
-## it during interpretation)
+## set variances 
 
-sX ~ 0.45*iX
-sY ~ -0.2*iY
+y4 ~~ 2*y4
+x4 ~~ 1*x4
 
-sY ~~ 1*sY
-y4 ~~ 1.2*y4
-
-outcome ~~ 3*outcome
-
-iX + iY ~ 2*1
+## set latent means/intercepts
+iX ~ 2*1
 sX ~ 1*1
 sY ~ -1*1
-qY ~ -2*1
+qY ~ -1.5*1
 
-outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+sY ~ 2*predictor
 
+outcome ~ 2*iX + 3*sY 
   '
 ```
 
-
-In the data I simulated, Variable `{x}` is changing linearly over time and variable `{y}` is changing quadratically. 
-
+In the data I simulated, Variable `{x}` is changing linearly over time and variable `{y}` is changing quadratically, which his what we found.
 
 ```{r eval=FALSE}
 sim_growth_dat <- simulateData(model = growth_mod, 

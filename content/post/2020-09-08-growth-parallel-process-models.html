@@ -14,35 +14,39 @@ topics: []
 
 
 
+<pre class="r"><code>library(lavaan)
+library(ggplot2)
+library(tidyverse)</code></pre>
 <div id="introduction" class="section level1">
 <h1>Introduction:</h1>
-<p>The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. 
-My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, untitl I found <code>{lavaan}</code>. 
-I had to do a <em>lot</em> of reading to figure out how to get versed in both SEM and the package, so I wanted to share a lavaan-specific tutorial in such methods here.
-This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., <a href="https://lavaan.ugent.be/tutorial/growth.html">the growth curve page on the <code>lavaan</code> website</a>) and putting two of these together can be daunting to a new <code>R</code> or <code>lavaan</code> user.
-Think of this more as a tutorial of the steps needed to take when fitting growth models in <code>lavaan</code>, rather than a tutorial solely on either the method or the software.
-As a quick terminology aside: I refer to growth models where 2+ factors are modeled “in parallel over time” as parallel process models (PPMs), but they are sometimes referred to differently. </p>
-<div id="notes" class="section level4">
-<h4>Notes:</h4>
+<p>The first research project I worked on in graduate school was a secondary data analysis on a longitudinal study. I developed some research questions and dove in. I looked for wave-to-wave changes in various constructs of interest to me. Quickly, though, I began asking questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. </p>
+<p>One P.I. directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, then I found <code>{lavaan}</code>. </p>
+<p>I had to do a <em>lot</em> of reading to figure out how to get versed in both SEM and the package to answer these questions, so I wanted to share a lavaan-specific tutorial in such methods here.</p>
+<p>This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., <a href="https://lavaan.ugent.be/tutorial/growth.html">the growth curve page on the <code>{lavaan}</code> website</a>) and putting two of these together can be daunting to a new <code>{R}</code> or <code>{lavaan}</code> user.</p>
+<p>Think of this more as a tutorial of the steps needed to take when fitting growth models in <code>{lavaan}</code>, rather than a tutorial solely on either the method or the software.</p>
+<p>As a quick terminology aside: I refer to growth models where 2+ factors are modeled “in parallel over time” as parallel process models (PPMs), but they are sometimes referred to differently. </p>
+<div id="notes" class="section level5">
+<h5>NOTES:</h5>
 <ol style="list-style-type: decimal">
 <li><p>Being a SEM method, this assumes some familiarity with SEM, though I hope to present this in a way that is clear to as many people as possible.</p></li>
-<li><p>I expect you to understand or to be able to refer to <a href="https://lavaan.ugent.be/tutorial/index.html"><code>lavaan</code> syntax</a> for basic syntax/interpretation.</p></li>
+<li><p>I expect you to understand or to be able to refer to <a href="https://lavaan.ugent.be/tutorial/index.html"><code>{lavaan}</code> syntax</a> for basic syntax/interpretation.</p></li>
 <li><p>Consider what I give you the nuts and bolts in how to make this work, and you should refer to other resources for more in depth interpretations.</p></li>
 </ol>
 </div>
 </div>
 <div id="simulating-data-for-demonstration" class="section level1">
 <h1>Simulating Data for Demonstration</h1>
-<p>In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used <code>lavaan</code> to make my data, but other software can do this too. 
+<p>In order to complete this project, I simulated some data (n = 500). For simplicity, I actually used <code>{lavaan}</code> to make my data, but other software can do this too. 
 I am reserving the code for this until the end, in case you would like to know how I did that, or if you’re curious to see how closely our PPM approximates the structure of the data we made. 
 Specifically, I made two variables across 4 waves (growth modeling assumes time to be equally spaced). 
-I named the variables x1 = x at time 1, x2 = x at time 2, etc. &amp; y1 = y at time 1, etc.</p>
+I named the variables <code>{x1}</code> =<code>{x}</code>at time 1, <code>{x2}</code> = <code>{x}</code> at time 2, etc. &amp; <code>{y1}</code> = <code>{y}</code> at time 1, etc.</p>
 </div>
 <div id="fit-statistics" class="section level1">
 <h1>Fit statistics</h1>
-<p>It’s good practice to have a set of fit statistcs specified <em>a priori</em> so you aren’t cherry picking good and bad results. Here’s a spread of them I’ve selected:</p>
+<p>In SEM, goodness-of-fit testing is not free; you need degrees of freedom. Specifically, you can calculate fit on models where the highest term is <code>{x^(n-2)}</code> where <code>{n}</code> is the number of waves you have. I wanted to show a quadratic fitting process, so I included 4 waves (i.e., x^(4-2) = x^2-order models can be assessed for fit).</p>
+<p>It’s good practice to have a set of fit statistcs specified <em>a priori</em> so you aren’t cherry picking good and bad results. Here’s a spread of them I’ve selected, along with ideal levels of fit (commented out).</p>
 <pre class="r"><code>selected_fit_stats &lt;-   c(&quot;chisq.scaled&quot;,
-                         &quot;df.scaled&quot;,
+                         &quot;df.scaled&quot;, ## must be &gt;0 to test G.O.F.
                          &quot;pvalue.scaled&quot;, ## ideally n.s.
                          &quot;cfi.scaled&quot;, ## ideally ≥ 0.95
                          &quot;rmsea.scaled&quot;, ## ideally ≤ 0.05
@@ -53,12 +57,74 @@ I named the variables x1 = x at time 1, x2 = x at time 2, etc. &amp; y1 = y at t
 <div id="steps-for-a-ppm" class="section level1">
 <h1>Steps for a PPM:</h1>
 <ol style="list-style-type: decimal">
-<li>Assess fit of various models with different functional forms (i.e., no growth, linear growth, quadratic growth, etc.).</li>
-<li>Compare the fit of nested models.</li>
-<li>Repeat</li>
+<li>Plot your data</li>
+<li>Assess fit of various models for both variables (i.e., no growth, linear growth, quadratic growth, etc.).</li>
+<li>Combine individual ideal models</li>
+<li>Assess fit (&amp; modify syntax, typically, but that is nuanced &amp; beyond our scope)</li>
+<li>Plot the predicted data &amp; compare to step 1</li>
 </ol>
-<p>You can calculate fit on models where the highest term is x^(n-2)</p>
-<p>Time to first fit the model to an intercept-only model (i.e., no growth observed), then look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept).</p>
+</div>
+<div id="step-1.-plot-your-data" class="section level1">
+<h1>STEP 1. Plot your data</h1>
+<p>This should give you a guess at what forms probably will fit. I did some work in <code>{tidyr}</code> to move the data around, then plotted in <code>{ggplot2}</code>, where we can see individual trajectories for each construct over time.
+I set the <code>alpha</code> parameter very low (0.2) so lines are transparent and we can get at density of distribution.</p>
+<pre class="r"><code>sim_growth_dat$participant_n &lt;- 1:nrow(sim_growth_dat) #add participant number
+
+x_plot &lt;-
+pivot_longer(sim_growth_dat, 
+             cols = x1:x4, 
+             names_to = &#39;x&#39;,
+             names_prefix = &#39;x&#39;)
+
+individual_x_trajectories &lt;- 
+  ggplot(x_plot, aes(x = as.numeric(x), y = value, 
+                   group = participant_n, 
+                   color = participant_n))+
+  geom_line(alpha = 0.2) +
+  ggtitle(&#39;individual trajectories of x&#39;) +
+  xlab(&#39;Timepoint&#39;)+
+  ylab(&#39;x&#39;)+
+  theme_classic() + xlim(1,4)
+
+individual_x_trajectories</code></pre>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>You can see that the <code>{x}</code> variable is probably linearly increasing, but a very “shallow” quadratic model might fit better so we should check if it fits well. If both fit well, we will compare them with likelihood ratio tests (LRTs).</p>
+<pre class="r"><code>y_plot &lt;-
+pivot_longer(sim_growth_dat, 
+             cols = y1:y4, 
+             names_to = &#39;y&#39;,
+             names_prefix = &#39;y&#39;)
+
+individual_y_trajectories &lt;- 
+  ggplot(y_plot, aes(x = as.numeric(y), y = value, 
+                   group = participant_n, 
+                   color = participant_n)) + 
+  geom_line(alpha = 0.2) +
+  ggtitle(&#39;individual trajectories of y&#39;) +
+  xlab(&#39;Timepoint&#39;)+
+  ylab(&#39;y&#39;)+
+  theme_classic()+xlim(1,4)
+individual_y_trajectories</code></pre>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>It is clear that <code>{y}</code> decreases with time on average, but there is heterogeneity (or variability) in what happens for an individual case. It looks like a either a linear or quadratic model will fit best. </p>
+<p>Let’s dive in!</p>
+</div>
+<div id="step-2.-assess-fit-of-various-models" class="section level1">
+<h1>STEP 2. Assess fit of various models</h1>
+<p>Time to first fit the model to an intercept-only model (i.e., no growth observed).</p>
+<p>Next, we’ll look at linear growth (linear + intercept), then quadratic growth (quadratic + linear + intercept). We won’t go higher than that because we cannot assess fit with only 4 waves.</p>
+<p>There are lots of nuances here, but I discuss some common choices here.</p>
+<div id="function" class="section level3">
+<h3>Function</h3>
+<p>The <code>growth()</code> call in <code>{lavaan}</code> is an easy way to specify a growth model. By default, it sets means/intercepts of observed variables to 0 and determines mean structure for latent variables.</p>
+</div>
+<div id="estimator" class="section level3">
+<h3>Estimator</h3>
+<p>All data used here is continuous, so we’ll stick with maximum likelihood (<code>estimator = ML</code>) estimation, and I prefer to use the “robust” variant (<code>estimator = MLR</code>) whenever possible to account for non-normal data. </p>
+</div>
+<div id="missingness" class="section level3">
+<h3>Missingness</h3>
+<p>For simplicity, there is no missingness in this data. If there were, we could do Little’s Test of Missing data and see patterns of missingness. Assuming data was missing (completely) at random and we didn’t have too much missingness, we could use Full-information Maximum Likelihood to impute missing data. </p>
 <pre class="r"><code>int_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -66,41 +132,40 @@ iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
   &#39;
 int_x_fit &lt;- growth(model = int_x_mod,
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)</code></pre>
-<pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: some estimated ov
-## variances are negative</code></pre>
-<pre class="r"><code>int_x_fit_stats&lt;-fitmeasures(int_x_fit, selected_fit_stats) %&gt;% data.frame()
-int_x_fit_stats</code></pre>
-<pre><code>##                                .
-## chisq.scaled        2064.3493976
-## df.scaled              8.0000000
-## pvalue.scaled          0.0000000
-## cfi.scaled             0.0000000
-## rmsea.scaled           0.7169988
-## rmsea.pvalue.scaled    0.0000000
-## srmr                   1.5574880</code></pre>
+                     data = sim_growth_dat)
+
+int_x_fit_stats&lt;-fitmeasures(int_x_fit, selected_fit_stats) %&gt;% data.frame()
+round(int_x_fit_stats, 2)</code></pre>
+<pre><code>##                           .
+## chisq.scaled        1192.66
+## df.scaled              8.00
+## pvalue.scaled          0.00
+## cfi.scaled             0.02
+## rmsea.scaled           0.54
+## rmsea.pvalue.scaled    0.00
+## srmr                   0.63</code></pre>
+<p>The no growth model for <code>{x}</code> does not fit well by any measure. So we’ll move on.</p>
 <pre class="r"><code>int_y_mod &lt;- 
   &#39;
 iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
   &#39;
 int_y_fit &lt;- growth(model = int_y_mod, 
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)</code></pre>
+                     data = sim_growth_dat)</code></pre>
 <pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: some estimated lv
 ## variances are negative</code></pre>
 <pre class="r"><code>int_y_fit_stats&lt;-fitmeasures(int_y_fit, selected_fit_stats) %&gt;% data.frame()
-int_y_fit_stats</code></pre>
-<pre><code>##                                .
-## chisq.scaled        3671.5381788
-## df.scaled              8.0000000
-## pvalue.scaled          0.0000000
-## cfi.scaled             0.0000000
-## rmsea.scaled           0.9570186
-## rmsea.pvalue.scaled    0.0000000
-## srmr                   1.9360811</code></pre>
-<p>Neither of those fit well, so we can add a higher-order fit term. Specifically, we will check how well a linear-only growth model fits for the <code>{x}</code> &amp; <code>{y}</code> variables</p>
+round(int_y_fit_stats, 2)</code></pre>
+<pre><code>##                           .
+## chisq.scaled        3136.54
+## df.scaled              8.00
+## pvalue.scaled          0.00
+## cfi.scaled             0.00
+## rmsea.scaled           0.88
+## rmsea.pvalue.scaled    0.00
+## srmr                   0.98</code></pre>
+<p>The no growth model for <code>{y}</code> does not fit well by any measure either. 
+Next, we will check how well a linear-only growth model fits for the <code>{x}</code> &amp; <code>{y}</code> variables</p>
 <pre class="r"><code>linear_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -109,19 +174,19 @@ sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
   &#39;
 linear_x_fit &lt;- growth(model = linear_x_mod,
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 linear_x_fit_stats&lt;-fitmeasures(linear_x_fit, selected_fit_stats) %&gt;% data.frame()
-linear_x_fit_stats</code></pre>
-<pre><code>##                              .
-## chisq.scaled        5.49443372
-## df.scaled           5.00000000
-## pvalue.scaled       0.35855663
-## cfi.scaled          0.99969401
-## rmsea.scaled        0.01406320
-## rmsea.pvalue.scaled 0.84594503
-## srmr                0.01561116</code></pre>
+round(linear_x_fit_stats, 2)</code></pre>
+<pre><code>##                        .
+## chisq.scaled        4.03
+## df.scaled           5.00
+## pvalue.scaled       0.54
+## cfi.scaled          1.00
+## rmsea.scaled        0.00
+## rmsea.pvalue.scaled 0.92
+## srmr                0.02</code></pre>
+<p>The linear growth model for <code>{x}</code> fits well by all measures. This is what we expected based on the graph of observed data. We should test quadratic models for fit, though.</p>
 <pre class="r"><code>linear_y_mod &lt;- 
   &#39;
 iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
@@ -129,24 +194,23 @@ sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
   &#39;
 linear_y_fit &lt;- growth(model = linear_y_mod,
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)</code></pre>
+                     data = sim_growth_dat)</code></pre>
 <pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: some estimated ov
 ## variances are negative</code></pre>
-<pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: some estimated lv
-## variances are negative</code></pre>
 <pre class="r"><code>linear_y_fit_stats&lt;-fitmeasures(linear_y_fit, selected_fit_stats) %&gt;% data.frame()
-linear_y_fit_stats</code></pre>
-<pre><code>##                                .
-## chisq.scaled        1181.3526239
-## df.scaled              5.0000000
-## pvalue.scaled          0.0000000
-## cfi.scaled             0.2720970
-## rmsea.scaled           0.6859599
-## rmsea.pvalue.scaled    0.0000000
-## srmr                   1.2678251</code></pre>
-<p>Looks like the linear <code>{x}</code> fits very well, but not <code>{y}</code>. We should check if the quadratic growth models fit well. We’ll do both variables, in case a quadratic model fits the <code>{x}</code> better than the linear model for <code>{x}</code>.</p>
-<p>As a note: Quadratic terms represent the rate of change of the slope on average across the waves. This is synonymous with acceleration, though this terminology is not often used; ‘quadratic growth’ is typically preferred</p>
+round(linear_y_fit_stats, 2)</code></pre>
+<pre><code>##                          .
+## chisq.scaled        842.85
+## df.scaled             5.00
+## pvalue.scaled         0.00
+## cfi.scaled            0.61
+## rmsea.scaled          0.58
+## rmsea.pvalue.scaled   0.00
+## srmr                  0.55</code></pre>
+<p>Looks like the linear <code>{y}</code> is inadequate acrross all measures. </p>
+<div id="note" class="section level5">
+<h5>NOTE:</h5>
+<p>Quadratic terms represent the average rate of change of the slope across waves. This is synonymous with acceleration in other disciplines, though this terminology is not often used and ‘quadratic growth’ is typically preferred in SEM.</p>
 <pre class="r"><code>quad_x_mod &lt;- 
   &#39;
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
@@ -157,15 +221,42 @@ qX =~ 0*x1 + 1*x2 + 4*x3 + 9*x4
   &#39;
 quad_x_fit &lt;- growth(model = quad_x_mod, 
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)
-
-quad_x_fit_stats &lt;- fitmeasures(quad_x_fit, selected_fit_stats)
-quad_x_fit_stats</code></pre>
+                     data = sim_growth_dat)</code></pre>
+<pre><code>## Warning in lav_object_post_check(object): lavaan WARNING: some estimated ov
+## variances are negative</code></pre>
+<pre class="r"><code>quad_x_fit_stats &lt;- fitmeasures(quad_x_fit, selected_fit_stats)
+round(quad_x_fit_stats, 2)</code></pre>
 <pre><code>##        chisq.scaled           df.scaled       pvalue.scaled          cfi.scaled 
-##               0.429               1.000               0.512               1.000 
+##                0.02                1.00                0.89                1.00 
 ##        rmsea.scaled rmsea.pvalue.scaled                srmr 
-##               0.000               0.717               0.003</code></pre>
+##                0.00                0.94                0.00</code></pre>
+<p>Here we have an interesting issue, as <code>{x}</code> fits fairly well to both a linear &amp; a quadratic model, but we have a Heywood case, specifically the estimated observed variable variance is negative. Let’s inspect </p>
+<pre class="r"><code>lavInspect(quad_x_fit, &quot;est&quot;)$theta</code></pre>
+<pre><code>##    x1     x2     x3     x4    
+## x1  1.171                     
+## x2  0.000  0.718              
+## x3  0.000  0.000  1.213       
+## x4  0.000  0.000  0.000 -0.064</code></pre>
+<p>Our <code>{x4}</code> variable has a negative estimate for the observed variable’s variance. This is a problem, and indicates the model may not represent the data well. There are ways to use parameter constraints to see if the fit is good if we “force” a change to this parameter, but that’s beyond our scope today.</p>
+<p>For teaching purposes, we’ll pretend we didn’t have a Heywood case to do the next step.</p>
+<p>When you have two well-fitting nested models (in our case linear &amp; quadratic models), we can compare the fit formally with Likelihood Ratio Tests (LRTs). The null hypothesis is essentially that there is no difference in the variance explained by the two models. Parsimony is preferred in a situation where the variance explained is equivalent. </p>
+</div>
+<div id="note-1" class="section level5">
+<h5>NOTE:</h5>
+<p>Some will say this test is only valid if the models have n.s. p-values and there are no Heywood cases.</p>
+<pre class="r"><code>lavTestLRT(linear_x_fit, quad_x_fit)</code></pre>
+<pre><code>## Scaled Chi-Squared Difference Test (method = &quot;satorra.bentler.2001&quot;)
+## 
+## lavaan NOTE:
+##     The &quot;Chisq&quot; column contains standard test statistics, not the
+##     robust test that should be reported per model. A robust difference
+##     test is a function of two standard (not robust) statistics.
+##  
+##              Df    AIC    BIC  Chisq Chisq diff Df diff Pr(&gt;Chisq)
+## quad_x_fit    1 7570.4 7625.2 0.0200                              
+## linear_x_fit  5 7566.4 7604.3 4.0675     4.0026       4     0.4056</code></pre>
+<p>Here, a non-significant p-value tells us that the linear model is preferred here. </p>
+<p>Now onto the quadratic <code>{y}</code> model.</p>
 <pre class="r"><code>quad_y_mod &lt;- 
   &#39;
 iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
@@ -176,20 +267,25 @@ qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
   &#39;
 quad_y_fit &lt;- growth(model = quad_y_mod, 
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)
+                     data = sim_growth_dat)
 
 quad_y_fit_stats &lt;- fitmeasures(quad_y_fit, selected_fit_stats)
 quad_y_fit_stats</code></pre>
 <pre><code>##        chisq.scaled           df.scaled       pvalue.scaled          cfi.scaled 
-##               0.007               1.000               0.932               1.000 
+##               0.190               1.000               0.663               1.000 
 ##        rmsea.scaled rmsea.pvalue.scaled                srmr 
-##               0.000               0.963               0.000</code></pre>
-<p>It’s clear that only the <code>{x}</code> linear model was a good one by all fit statistics. When using real—world data—rather than data simulated to be specific functional forms—this may or may not be the case. If that’s the case, there are resources about comparing models. One popular way is through likelihood-ratio tests or chi-square difference tests.</p>
+##               0.000               0.813               0.001</code></pre>
+<p>It’s clear that only the <code>{x}</code> linear model was a good one by all fit statistics. We could actually easily see this earlier in Step 1, but it is good that we checked. </p>
+<p>When using real—world data this may or may not be the case; I simulated this data specifically to be clean linear and quadratic models for <code>{x}</code> &amp; <code>{y}</code> respectively. </p>
 </div>
-<div id="parallel-process-model" class="section level1">
-<h1>Parallel process model</h1>
-<p>Now that we are fairly confident in functional forms, let’s model them together</p>
+</div>
+</div>
+<div id="step-3.-building-the-ppm" class="section level1">
+<h1>STEP 3. Building the PPM</h1>
+<p>Now that we are fairly confident in functional forms, let’s model them together. </p>
+<div id="note-2" class="section level5">
+<h5>NOTE:</h5>
+<p>For simplicity we are <em>not</em> specifying conditional models which make future growth terms conditional upon earlier growth terms. The distinction between the two is subtle and deserves its own conversation later. For now, just assume growth terms are simply correlated, rather than causally linked.</p>
 <pre class="r"><code>full_model &lt;- 
   &#39;
 ## intercept &amp; slope growth terms for X
@@ -201,25 +297,29 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
 sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
 qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
 
-sX ~ a1*iX + iY
-sY ~ iX + a2*iY
-qY ~ a3*sY + sX + iX + iY 
+## regress growth terms on predictor
+qY + iY + sX + iX ~ predictor
+sY ~ a1*predictor
 
-sY ~~ sX
-iY ~~ iX
+## regress outcome on growth terms
+outcome ~ iX + sX + iY + b1*sY + qY
 
-outcome ~ iX + b1*sX + iY + b2*sY + b3*qY
+## testing indirect effect 
+## predictor --&gt; sY --&gt; outcome
 
-iX_sX_outcome := a1*b1
-iY_sY_outcome := a2*b2
-sY_qY_outcome := a3*b3
+predictor_sY_outcome:=a1*b1
   &#39;
 
 full_fit &lt;- growth(model = full_model, 
                      estimator = &#39;MLR&#39;,
-                     data = sim_growth_dat,
-                     meanstructure = T)
-full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
+                     data = sim_growth_dat)
+full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)
+round(full_fit_stats,2) </code></pre>
+<pre><code>##        chisq.scaled           df.scaled       pvalue.scaled          cfi.scaled 
+##               28.23               34.00                0.75                1.00 
+##        rmsea.scaled rmsea.pvalue.scaled                srmr 
+##                0.00                1.00                0.03</code></pre>
+</div>
 </div>
 <div id="full-model-fit" class="section level1">
 <h1>Full Model Fit</h1>
@@ -227,20 +327,20 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 <pre class="r"><code>summary(full_fit,
         stand = T,
         rsq = T)</code></pre>
-<pre><code>## lavaan 0.6-7.1577 ended normally after 100 iterations
+<pre><code>## lavaan 0.6-7.1577 ended normally after 65 iterations
 ## 
 ##   Estimator                                         ML
 ##   Optimization method                           NLMINB
-##   Number of free parameters                         34
+##   Number of free parameters                         29
 ##                                                       
 ##   Number of observations                           500
 ##                                                       
 ## Model Test User Model:
 ##                                                Standard      Robust
-##   Test Statistic                                 15.848      15.978
-##   Degrees of freedom                                 20          20
-##   P-value (Chi-square)                            0.726       0.718
-##   Scaling correction factor                                   0.992
+##   Test Statistic                                 28.456      28.233
+##   Degrees of freedom                                 34          34
+##   P-value (Chi-square)                            0.736       0.746
+##   Scaling correction factor                                   1.008
 ##        Yuan-Bentler correction (Mplus variant)                     
 ## 
 ## Parameter Estimates:
@@ -252,57 +352,49 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 ## Latent Variables:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
 ##   iX =~                                                                 
-##     x1                1.000                               1.049    0.725
-##     x2                1.000                               1.049    0.494
-##     x3                1.000                               1.049    0.345
-##     x4                1.000                               1.049    0.255
+##     x1                1.000                               1.023    0.704
+##     x2                1.000                               1.023    0.588
+##     x3                1.000                               1.023    0.404
+##     x4                1.000                               1.023    0.295
 ##   sX =~                                                                 
 ##     x1                0.000                               0.000    0.000
-##     x2                1.000                               1.121    0.528
-##     x3                2.000                               2.242    0.738
-##     x4                3.000                               3.363    0.817
+##     x2                1.000                               1.046    0.601
+##     x3                2.000                               2.092    0.826
+##     x4                3.000                               3.138    0.905
 ##   iY =~                                                                 
-##     y1                1.000                               1.073    0.736
-##     y2                1.000                               1.073    0.579
-##     y3                1.000                               1.073    0.235
-##     y4                1.000                               1.073    0.111
+##     y1                1.000                               1.020    0.721
+##     y2                1.000                               1.020    0.350
+##     y3                1.000                               1.020    0.161
+##     y4                1.000                               1.020    0.089
 ##   sY =~                                                                 
 ##     y1                0.000                               0.000    0.000
-##     y2                1.000                               1.183    0.638
-##     y3                2.000                               2.366    0.517
-##     y4                3.000                               3.548    0.368
+##     y2                1.000                               2.312    0.793
+##     y3                2.000                               4.624    0.732
+##     y4                3.000                               6.936    0.604
 ##   qY =~                                                                 
 ##     y1                0.000                               0.000    0.000
-##     y2                1.000                               1.080    0.583
-##     y3                4.000                               4.321    0.944
-##     y4                9.000                               9.722    1.008
+##     y2                1.000                               0.964    0.331
+##     y3                4.000                               3.855    0.610
+##     y4                9.000                               8.674    0.755
 ## 
 ## Regressions:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-##   sX ~                                                                  
-##     iX        (a1)    0.511    0.096    5.341    0.000    0.479    0.479
-##     iY                0.061    0.069    0.883    0.377    0.059    0.059
-##   sY ~                                                                  
-##     iX                0.038    0.091    0.416    0.677    0.034    0.034
-##     iY        (a2)   -0.328    0.114   -2.878    0.004   -0.297   -0.297
 ##   qY ~                                                                  
-##     sY        (a3)   -0.199    0.107   -1.866    0.062   -0.218   -0.218
-##     sX                0.040    0.064    0.625    0.532    0.041    0.041
-##     iX                0.017    0.078    0.217    0.828    0.016    0.016
-##     iY               -0.033    0.062   -0.526    0.599   -0.032   -0.032
+##     predictor         0.041    0.048    0.850    0.395    0.042    0.043
+##   iY ~                                                                  
+##     predictor         0.034    0.060    0.564    0.573    0.033    0.034
+##   sX ~                                                                  
+##     predictor         0.008    0.051    0.161    0.872    0.008    0.008
+##   iX ~                                                                  
+##     predictor         0.067    0.060    1.119    0.263    0.065    0.066
+##   sY ~                                                                  
+##     predictor (a1)    2.022    0.079   25.545    0.000    0.874    0.888
 ##   outcome ~                                                             
-##     iX                0.114    0.281    0.404    0.686    0.119    0.027
-##     sX        (b1)    1.913    0.232    8.243    0.000    2.145    0.492
-##     iY                0.233    0.241    0.967    0.334    0.250    0.057
-##     sY        (b2)    2.580    0.366    7.056    0.000    3.051    0.700
-##     qY        (b3)    1.585    0.232    6.828    0.000    1.712    0.393
-## 
-## Covariances:
-##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-##  .sX ~~                                                                 
-##    .sY               -0.062    0.107   -0.579    0.563   -0.056   -0.056
-##   iX ~~                                                                 
-##     iY                0.073    0.084    0.874    0.382    0.065    0.065
+##     iX                1.994    0.145   13.755    0.000    2.040    0.278
+##     sX               -0.017    0.146   -0.115    0.908   -0.018   -0.002
+##     iY               -0.028    0.186   -0.149    0.881   -0.028   -0.004
+##     sY        (b1)    2.973    0.104   28.596    0.000    6.874    0.937
+##     qY               -0.242    0.161   -1.510    0.131   -0.234   -0.032
 ## 
 ## Intercepts:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
@@ -315,74 +407,59 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 ##    .y3                0.000                               0.000    0.000
 ##    .y4                0.000                               0.000    0.000
 ##    .outcome           0.000                               0.000    0.000
-##     iX                2.007    0.060   33.474    0.000    1.913    1.913
-##    .sX                0.817    0.225    3.625    0.000    0.729    0.729
-##     iY                1.967    0.064   30.833    0.000    1.832    1.832
-##    .sY               -0.758    0.237   -3.195    0.001   -0.641   -0.641
-##    .qY               -2.389    0.196  -12.202    0.000   -2.211   -2.211
+##    .iX                1.976    0.059   33.700    0.000    1.931    1.931
+##    .sX                0.991    0.051   19.350    0.000    0.948    0.948
+##    .iY                0.031    0.061    0.508    0.611    0.030    0.030
+##    .sY               -1.153    0.082  -14.019    0.000   -0.499   -0.499
+##    .qY               -1.548    0.048  -32.151    0.000   -1.607   -1.607
 ## 
 ## Variances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-##    .x1                0.992    0.112    8.825    0.000    0.992    0.474
-##    .x2                1.023    0.079   12.932    0.000    1.023    0.227
-##    .x3                0.826    0.089    9.281    0.000    0.826    0.090
-##    .x4                1.115    0.185    6.011    0.000    1.115    0.066
-##    .y1                0.972    0.164    5.915    0.000    0.972    0.458
-##    .y2                0.917    0.100    9.123    0.000    0.917    0.267
-##    .y3                0.972    0.231    4.207    0.000    0.972    0.046
-##    .y4                0.728    1.563    0.466    0.642    0.728    0.008
-##    .outcome           4.636    1.153    4.019    0.000    4.636    0.244
-##     iX                1.100    0.122    9.053    0.000    1.000    1.000
-##    .sX                0.960    0.127    7.582    0.000    0.764    0.764
-##     iY                1.152    0.162    7.110    0.000    1.000    1.000
-##    .sY                1.276    0.293    4.350    0.000    0.912    0.912
-##    .qY                1.111    0.081   13.700    0.000    0.952    0.952
+##    .x1                1.067    0.099   10.777    0.000    1.067    0.505
+##    .x2                0.885    0.069   12.924    0.000    0.885    0.292
+##    .x3                0.983    0.104    9.492    0.000    0.983    0.153
+##    .x4                1.113    0.197    5.646    0.000    1.113    0.093
+##    .y1                0.961    0.107    8.991    0.000    0.961    0.480
+##    .y2                0.868    0.083   10.470    0.000    0.868    0.102
+##    .y3                0.996    0.179    5.557    0.000    0.996    0.025
+##    .y4                2.467    0.949    2.601    0.009    2.467    0.019
+##    .outcome           0.814    0.927    0.878    0.380    0.814    0.015
+##    .iX                1.043    0.100   10.444    0.000    0.996    0.996
+##    .sX                1.094    0.076   14.393    0.000    1.000    1.000
+##    .iY                1.040    0.108    9.595    0.000    0.999    0.999
+##    .sY                1.131    0.125    9.078    0.000    0.212    0.212
+##    .qY                0.927    0.068   13.684    0.000    0.998    0.998
 ## 
 ## R-Square:
 ##                    Estimate
-##     x1                0.526
-##     x2                0.773
-##     x3                0.910
-##     x4                0.934
-##     y1                0.542
-##     y2                0.733
-##     y3                0.954
-##     y4                0.992
-##     outcome           0.756
-##     sX                0.236
-##     sY                0.088
-##     qY                0.048
+##     x1                0.495
+##     x2                0.708
+##     x3                0.847
+##     x4                0.907
+##     y1                0.520
+##     y2                0.898
+##     y3                0.975
+##     y4                0.981
+##     outcome           0.985
+##     iX                0.004
+##     sX                0.000
+##     iY                0.001
+##     sY                0.788
+##     qY                0.002
 ## 
 ## Defined Parameters:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-##     iX_sX_outcome     0.979    0.236    4.141    0.000    1.026    0.236
-##     iY_sY_outcome    -0.845    0.259   -3.259    0.001   -0.907   -0.208
-##     sY_qY_outcome    -0.315    0.208   -1.515    0.130   -0.373   -0.086</code></pre>
-<pre class="r"><code># lavaanPlot(model = full_fit, coefs = T, stars = T,
-#            covs = T)
-# edge.label.cex = .6, what = &quot;std&quot;, whatLabels = &quot;std&quot;,
-#          label.prop=0.9, edge.label.color = &quot;black&quot;, rotation = 1, #layout = &quot;circle&quot;,
-#          equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
-#          edge.width = 0.5, shapeMan = &quot;rectangle&quot;, shapeLat = &quot;ellipse&quot;, intercepts = F, #structural = T,
-#          shapeInt = &quot;triangle&quot;, sizeMan = 4, sizeInt = 2, sizeLat = 4, 
-#          curve=2, unCol = &quot;#070b8c&quot;, title = T)
-# title(&quot;Full Model&quot;)</code></pre>
+##     predctr_sY_tcm    6.011    0.159   37.874    0.000    6.011    0.832</code></pre>
 </div>
-<div id="direct-paths-regressions" class="section level1">
-<h1>Direct Paths / Regressions</h1>
-<p>The model shows that the variable <code>{outcome}</code> is predicted significantly by linear slopes of both <code>{x}</code> and <code>{y}</code> (i.e., <code>{sX}</code> &amp; <code>{sY}</code>), as well as the <code>{qY}</code>. Baseline levels of both variables (<code>{iX}</code> &amp; <code>{iY}</code>) did not significantly predict the outcome. </p>
-<p>We observed a significant indirect effect from baseline <code>{iX}</code> through <code>{sX}</code> to the <code>{outcome}</code>, which is likely why we do not see a direct effect of <code>{iX}</code> on the <code>{outcome}</code>. The same process is observed in <code>{Y}</code>. There was no indirect effect from <code>{sY}</code> to <code>{qY}</code> on <code>{outcome}</code></p>
-<div id="covariances" class="section level3">
-<h3>Covariances</h3>
-<p>[ADD MATERIAL]</p>
-</div>
-<div id="means-intercepts" class="section level3">
-<h3>Means / Intercepts</h3>
-</div>
+<div id="interpretation" class="section level1">
+<h1>Interpretation</h1>
+<p>I am going to trust you understand how to read <code>{lavaan}</code> here, so I’m not going to walk through this line by line. The headlines are <code>{iX}</code> &amp; <code>{sY}</code> significantly predict <code>{outcome}</code>, with the latter predicting it to a much larger degree than the former. </p>
+<p>This means baseline levels of <code>{x}</code> predict outcome, as does the linear rate of change of <code>{y}</code>, both positively such that higher levels of initial <code>{x}</code> or faster rates of change in <code>{y}</code> lead to higher levels of <code>{outcome}</code>.</p>
+<p>In our example, I included a time-invariant covariate <code>{predictor}</code>. Since <code>{predictor}</code> significantly predicted <code>{sY}</code> and <code>{sY}</code> predicted <code>{outcome}</code>, we would want to look for mediation. You may trust the estimate given by simply the product of each coefficient and it’s significance test, but it is better to rely on other methods to test indirect effects.</p>
 </div>
 <div id="bootstrapping" class="section level1">
 <h1>Bootstrapping</h1>
-<p>Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic better than I can, but I used this to test the indirect effects using 5000 simulated data sets.</p>
+<p>Bootstrapping is a resampling method (with replacement) that is appreciated for building confidence intervals around parameter estimates of indirect effects, at least in part, because they do not make distributional assumptions about the indirect effect. This creates a more reliable test than standard significance tests. A quick Google Scholar search can inform you on this topic more deeply than this post, but I used this to test the indirect effects using 5000 simulated data sets.</p>
 <pre class="r"><code>final_fit_boot&lt;- growth(full_fit, data = sim_growth_dat, estimator = &quot;ML&quot;,
                         meanstructure = T,
                         se = &quot;bootstrap&quot;,
@@ -392,39 +469,50 @@ full_fit_stats &lt;- fitmeasures(full_fit, selected_fit_stats)</code></pre>
 parameterEstimates(final_fit_boot,
                    level = .95,
                    boot.ci.type = &quot;bca.simple&quot;,
-                   stand = T)[64:66,c(4,5,9,10)]</code></pre>
-<pre><code>##            label    est ci.lower ci.upper
-## 64 iX_sX_outcome  0.979    0.591    1.604
-## 65 iY_sY_outcome -0.845   -1.335   -0.163
-## 66 sY_qY_outcome -0.315   -0.680    0.098</code></pre>
-<p>The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call <code>{summary(full_fit, fit.measures = T)}</code>, which I didn’t do for brevity. </p>
-<p>Furthermore, we find the same results as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used the BCa simple variant used in <code>{lavaan}</code>. As a note, you should <em>not</em> trust the p-values from this parameterEstimates() if you go with anything but the default for <code>boot.ci.type =</code> if you use any <code>boot.ci.type</code> other than <code>norm</code>, as that is how the p-value is calculated. You can see a discussion between me &amp; the lavaan Google Group about this if you do some digging. It may be changed in the future, but is not of yet (to my knowledge). Simply report Confidence Intervals (95% in my case).</p>
+                   stand = T)[61,c(4,5,9,10)]</code></pre>
+<pre><code>##                   label   est ci.lower ci.upper
+## 61 predictor_sY_outcome 6.011    5.707    6.335</code></pre>
+<p>The model converged nearly every time without issue. Of our 5000 bootstrap draws, only 7 were not successful; this is not shown here, but is if you call <code>{summary(full_fit, fit = T)}</code>, which I didn’t do for brevity. </p>
+<p>Furthermore, looking at the 95% confidence intervals, we find the same result as we did regarding the indirect effect as without bootstrapping. These are the results I trust more, especially since we used <code>bca.simple</code>. </p>
+<p>Most likely this is what we wanted to do with this model (at least in my field). Assess if a predictor influences growth in a construct, then see if there is an indirect effect (and quanitify its magnitude).</p>
+<div id="note-3" class="section level5">
+<h5>NOTE:</h5>
+<p>I made it so only the label, unstandardized estimate and confidence intervals showed up with the <code>[61,c(4,5,9,10)]</code> portion of code, but you should <em>not</em> trust the p-values from this parameterEstimates() if you go with <em>anything but the default</em> (i.e., <code>boot.ci.type = norm</code>). 
+This is because the p-value is built assuming a normal distribution; this eliminates some of the benefits of bootstrapping gained by <code>bca.simple</code> and other methods, but gives you a p-value, which matters a lot to some.</p>
+</div>
 </div>
 <div id="plotting" class="section level1">
 <h1>Plotting</h1>
-<p>We can plot the growth of these traits, as well with <code>{ggplot2}</code> 
-First we extract factor scores &amp; save this as a data frame, then we can plot.
+<p>We can plot the growth of these traits, as well with <code>{ggplot2}</code>, which helps verify you did this correctly. I won’t go into it here, but these plots can be modified with facet wrapping and other grouping/coloring methods to see how different groups have different slopes, for example. </p>
+<p>First we extract factor scores &amp; save this as a data frame, then we can plot.
 For a linear model, this is pretty simple:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
+plot_dat$participant_n &lt;- 1:nrow(plot_dat)
+plot_dat$predictor &lt;- sim_growth_dat$predictor
 
-plot_X &lt;- ggplot(data=plot_dat) +
+
+predicted_x_trajectories &lt;- ggplot(data=plot_dat) +
 scale_x_continuous(name = &quot;Timepoint&quot;,
-                 limits=c(0,3),
+                 limits=c(0, 3),
                  breaks = c(0, 1, 2, 3),
                  labels = c(&#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;)
                  ) +
-scale_y_continuous(name = &quot;X&quot;,
-                 limits=c(0,30)
+scale_y_continuous(name = &quot;x&quot;,
+                 limits=c(-5,15)
                  )+
   geom_abline(data=plot_dat, 
               mapping=aes(slope=sX, 
-                          intercept=iX), 
-              color = &quot;lightblue&quot;) + 
-  theme_minimal()
-plot_X</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+                          intercept=iX, 
+                          color = participant_n),
+              alpha = 0.2) + 
+  theme_classic() + ggtitle(&#39;predicted x trajectories&#39;) </code></pre>
+<p>With this call, I can stack the actual and predicted trajectory graphs:</p>
+<pre class="r"><code>gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)</code></pre>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p>For a quadratic model, this is more challenging, but here’s some code to do it:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
+plot_dat$participant_n &lt;- 1:nrow(plot_dat)
+plot_dat$predictor &lt;- sim_growth_dat$predictor
 
 qY &lt;- plot_dat$qY
 sY &lt;- plot_dat$sY
@@ -433,10 +521,7 @@ iY &lt;- plot_dat$iY
 test &lt;- function(y) {qY*y ^ 2 + sY*y + iY}
 
 
-
-nrow(plot_dat)</code></pre>
-<pre><code>## [1] 500</code></pre>
-<pre class="r"><code>plot_dat_2&lt;-data.frame(`T1` = test(0), 
+plot_dat_2&lt;-data.frame(`T1` = test(0), 
                        `T2` = test(1), 
                        `T3` = test(2), 
                        `T4` = test(3), 
@@ -462,26 +547,35 @@ df_long_wave &lt;- matrix(c(rep(1,500),
                       ncol = 1)
 
 
-plot_dat_2 &lt;- data.frame(id = matrix(
-  rep(1:500,4), ncol = 1),
+plot_dat_2 &lt;- data.frame(
+  participant_n = matrix(
+    rep(1:500,4), ncol = 1),
   Timepoint = df_long_wave,
-  Y = Y_df)
+  y = Y_df)
 
-
-plot_Y &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint, 
-                          y = Y, 
-                          group = id)) +
+predicted_y_trajectories &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint, 
+                          y = y, 
+                          group = participant_n, 
+                          color = participant_n), 
+                          alpha = 0.2) +
  geom_smooth(formula = y ~ x + I(x^2), 
              method = &quot;lm&quot;, se = F)+
-  theme_minimal() 
-
-plot_Y</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+  theme_classic() + ggtitle(&#39;predicted trajectories of y&#39;)</code></pre>
+<p>Again, let’s stack the actual and predicted trajectory graphs:</p>
+<pre class="r"><code>gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)</code></pre>
+<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+<div id="next-steps" class="section level1">
+<h1>Next Steps:</h1>
+<p>If you were to be working on this, I would work further to make the model more parsimoneous, as well as seeing if alternate modifications would increase model fit.
+Ways to do this include, but are not limited to, constraining residuals, assessing the role of the predictor on the observed vs. manifest model, making the growth terms conditional upon earlier terms, etc.</p>
 </div>
 <div id="looking-at-the-simulation-call" class="section level1">
 <h1>Looking at the simulation call</h1>
+<p>Here is the exact simulation call I did in case anyone is curious. I wanted the data to be interesting, so I made sure to set some things (e.g., variances, latent means/intercepts, relationships between variables, etc.)</p>
 <pre class="r"><code>growth_mod &lt;- 
   &#39;
+
 ## intercept &amp; slope growth terms for X
 iX =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
 sX =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
@@ -491,26 +585,22 @@ iY =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
 sY =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
 qY =~ 0*y1 + 1*y2 + 4*y3 + 9*y4
 
-## (ignore this for now, we will come back to
-## it during interpretation)
+## set variances 
 
-sX ~ 0.45*iX
-sY ~ -0.2*iY
+y4 ~~ 2*y4
+x4 ~~ 1*x4
 
-sY ~~ 1*sY
-y4 ~~ 1.2*y4
-
-outcome ~~ 3*outcome
-
-iX + iY ~ 2*1
+## set latent means/intercepts
+iX ~ 2*1
 sX ~ 1*1
 sY ~ -1*1
-qY ~ -2*1
+qY ~ -1.5*1
 
-outcome ~ 0*iX + 0*iY + 2*sX + 3*sY + 1*qY
+sY ~ 2*predictor
 
+outcome ~ 2*iX + 3*sY 
   &#39;</code></pre>
-<p>In the data I simulated, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically.</p>
+<p>In the data I simulated, Variable <code>{x}</code> is changing linearly over time and variable <code>{y}</code> is changing quadratically, which his what we found.</p>
 <pre class="r"><code>sim_growth_dat &lt;- simulateData(model = growth_mod, 
                                model.type = &quot;growth&quot;, 
                                seed = 82020, 

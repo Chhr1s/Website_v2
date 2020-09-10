@@ -18,7 +18,7 @@
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
       <guid>/post/growth-parallel-process-models/</guid>
-      <description>Introduction: The first project I worked on in graduate school was doing secondary data analysis on a six-wave longitudinal study. I developed some research questions and dove in, looking at changes from one wave to the next. Quickly, though, I began expressing questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. My advisor directed me towards structural equation modeling—as this was her background—with focus on growth models.</description>
+      <description>library(lavaan) library(ggplot2) library(tidyverse) Introduction: The first research project I worked on in graduate school was a secondary data analysis on a longitudinal study. I developed some research questions and dove in. I looked for wave-to-wave changes in various constructs of interest to me. Quickly, though, I began asking questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. One P.I. directed me towards structural equation modeling—as this was her background—with focus on growth models.</description>
     </item>
     
     <item>
