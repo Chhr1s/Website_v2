@@ -7,7 +7,7 @@ title: Education
 
 # Doctoral Student: [Quantitative Research Methods in Education](https://education.uoregon.edu/qrme)
 * Fall 2020 - Present
-* Housed in Department of Education Methodology, Policy, & Leadership | College of Education | UO
+* Department of Education Methodology, Policy, & Leadership | College of Education | UO
 
 # Master of Science: [Prevention Science](https://education.uoregon.edu/prevsci/graduate/ms) 
 
