@@ -13,17 +13,17 @@
   </url>
   
   <url>
-    <loc>/post/growth-parallel-process-models/</loc>
-    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/post/</loc>
+    <loc>/statistics/growth-parallel-process-models/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>/tags/sem/</loc>
+    <lastmod>2020-09-08T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/statistics/</loc>
     <lastmod>2020-09-08T00:00:00+00:00</lastmod>
   </url>
   
@@ -38,7 +38,12 @@
   </url>
   
   <url>
-    <loc>/post/decision_trees_in_r/</loc>
+    <loc>/data_science/</loc>
+    <lastmod>2020-06-02T10:57:23-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/data_science/decision_trees_in_r/</loc>
     <lastmod>2020-06-02T10:57:23-07:00</lastmod>
   </url>
   

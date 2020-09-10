@@ -37,7 +37,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     identifier = "Statistics"
     url = "/Statistics/"
   [[menu.main]]
-    name = "Data Science"
+    name = "Data_Science"
     pre = "<i class='fa fa-computer fa-fw'></i>"
     weight = 2
     identifier = "Data_Science"
