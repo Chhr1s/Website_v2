@@ -13,6 +13,15 @@
     
     
     <item>
+      <title>Education</title>
+      <link>/about/</link>
+      <pubDate>Wed, 09 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Doctoral Student in (Quantitative Research Methods in Education)[https://education.uoregon.edu/qrme] at University of Oregon  Fall 2020 - Present Housed in Department of Education Methodology, Policy, &amp;amp; Leadership (College of Education)  Master of Science in (Prevention Science)[https://education.uoregon.edu/prevsci/graduate/ms] at University of Oregon  Fall 2018 - Spring 2020 Graduated with a 4.14/4.00 GPA Housed in the Deparment of Counseling Psychology &amp;amp; Human Services (College of Education)  Bachelor of Arts in (Neuroscience)[https://www.hamilton.edu/academics/departments/Home?dept=Neuroscience] </description>
+    </item>
+    
+    <item>
       <title>Growth &amp; Parallel Process Models</title>
       <link>/post/growth-parallel-process-models/</link>
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
@@ -28,19 +37,6 @@
       
       <guid>/post/decision_trees_in_r/</guid>
       <description>Intro Tidyverse’s newest release has recently come together to form a cohesive suite of packages for modeling and machine learning, called {tidymodels}. The successor to Max Kuhn’s {caret} package, {tidymodels} allows for a tidy approach to your data from start to finish. We’re going to walk through the basics for getting off the ground with {tidymodels} and demonstrate its application to three different tree-based methods for predicting student test scores.</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>/about/</link>
-      <pubDate>Wed, 09 Apr 2014 00:00:00 +0000</pubDate>
-      
-      <guid>/about/</guid>
-      <description>Hugo is a static site engine written in Go.
-It makes use of a variety of open source projects including:
- Cobra Viper J Walter Weatherman Cast  Learn more and contribute on GitHub.
-Setup Some fun facts about Hugo:
- Built in Go Loosely inspired by Jekyll Primarily developed by spf13 on the train while commuting to and from Manhattan. Coded in Vim using spf13-vim  Have questions or suggestions?</description>
     </item>
     
     <item>
