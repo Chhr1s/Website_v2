@@ -18,7 +18,7 @@ The first research project I worked on in graduate school was a secondary data a
 
 One P.I. directed me towards structural equation modeling—as this was her background—with focus on growth models. At first I felt unable to pursue these methods with the price point of the software that she used for SEM, then I found `{lavaan}`. \n
 
-I had to do a *lot* of reading to figure out how to get versed in both SEM and the package to answer these questions, so I wanted to share a lavaan-specific tutorial in such methods here.\n
+I had to do a *lot* of reading to figure out how to get versed in both SEM and the package to answer these questions, so I wanted to share a `{lavaan}`-specific tutorial in such methods here.\n
 
 This project will look at growth of two factors over time, as most of the tutorials I have found explain only one factor (e.g., [the growth curve page on the `{lavaan}` website](https://lavaan.ugent.be/tutorial/growth.html)) and putting two of these together can be daunting to a new `{R}` or `{lavaan}` user.\n
 
