@@ -1,6 +1,6 @@
 baseurl = "/"
 languageCode = "en-us"
-title = "Christopher Loan's Website"
+title = "Christopher Loan"
 theme = "blackburn"
 author = "Christopher M. Loan, MS"
 copyright = "&copy; 2016. All rights reserved."
@@ -14,13 +14,13 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
   # Shown in the home page
-  subtitle = "A Hugo Theme"
-  brand = "Blackburn"
+  subtitle = "*Website Still In Development*"
+  brand = "CML"
   googleAnalytics = "Your Google Analytics tracking ID"
   disqus = "Your Disqus shortname"
   # CSS name for highlight.js
   highlightjs = "androidstudio"
-  dateFormat = "02 Jan 2006, 15:04"
+  dateFormat = "January 02 2006, 3:04 pm"
 
 [menu]
   # Shown in the side menu.
@@ -51,9 +51,5 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 [social]
   # Link your social networking accouns to the side menu
   # by entering your username or ID.
-  twitter = "*"
-  facebook = "*"
-  instagram = "*"
-  github = "yoshiharuyamashita"
-  stackoverflow = "*"
-  linkedin = "*"
+  github = "Chhr1s"
+  linkedin = "https://www.linkedin.com/in/christopher-loan-09965950/"
