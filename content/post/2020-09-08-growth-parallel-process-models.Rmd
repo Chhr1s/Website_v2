@@ -249,7 +249,7 @@ linear_y_fit_stats<-fitmeasures(linear_y_fit, selected_fit_stats) %>% data.frame
 round(linear_y_fit_stats, 2)
 ```
 
-Looks like the linear `{y}` is inadequate acrross all measures. \n
+Looks like the linear `{y}` is inadequate across all measures. \n
 
 ##### NOTE: 
 
