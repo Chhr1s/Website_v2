@@ -12,11 +12,6 @@ description: ''
 topics: []
 ---
 
-```{r message=FALSE, warning=FALSE, include=T}
-library(lavaan)
-library(ggplot2)
-library(tidyverse)
-```
 # Introduction: 
 
 The first research project I worked on in graduate school was a secondary data analysis on a longitudinal study. I developed some research questions and dove in. I looked for wave-to-wave changes in various constructs of interest to me. Quickly, though, I began asking questions about the growth and change of dynamic factors that I couldn't answer with the methods I knew. \n
@@ -38,6 +33,12 @@ As a quick terminology aside: I refer to growth models where 2+ factors are mode
 2. I expect you to understand or to be able to refer to [`{lavaan}` syntax](https://lavaan.ugent.be/tutorial/index.html) for basic syntax/interpretation.
 
 3. Consider what I give you the nuts and bolts in how to make this work, and you should refer to other resources for more in depth interpretations. 
+
+```{r message=FALSE, warning=FALSE, include=T}
+library(lavaan)
+library(ggplot2)
+library(tidyverse)
+```
 
 # Simulating Data for Demonstration
 
