@@ -7,13 +7,13 @@ title: Education
 
 # Doctoral Student [Quantitative Research Methods in Education](https://education.uoregon.edu/qrme) at University of Oregon
 * Fall 2020 - Present
-* Housed in Department of Education Methodology, Policy, & Leadership (College of Education)
+* Housed in Department of Education Methodology, Policy, & Leadership | College of Education | UO
 
-# Master of Science [Prevention Science](https://education.uoregon.edu/prevsci/graduate/ms) at University of Oregon
+# Master of Science [Prevention Science](https://education.uoregon.edu/prevsci/graduate/ms) 
 
 * Fall 2018 - Spring 2020
 * Graduated with a 4.14/4.00 GPA
-* Housed in the Deparment of Counseling Psychology & Human Services (College of Education)
+* Deparment of Counseling Psychology & Human Services | College of Education | University of Oregon
 
-# Bachelor of Arts in [Neuroscience](https://www.hamilton.edu/academics/departments/Home?dept=Neuroscience)
+# Bachelor of Arts in [Neuroscience at Hamilton College](https://www.hamilton.edu/academics/departments/Home?dept=Neuroscience) 
 
