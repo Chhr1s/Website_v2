@@ -23,19 +23,19 @@
     
     <item>
       <title>Growth &amp; Parallel Process Models</title>
-      <link>/stats/growth-parallel-process-models/</link>
+      <link>/growth-parallel-process-models/</link>
       <pubDate>Tue, 08 Sep 2020 00:00:00 +0000</pubDate>
       
-      <guid>/stats/growth-parallel-process-models/</guid>
+      <guid>/growth-parallel-process-models/</guid>
       <description>Introduction: The first research project I worked on in graduate school was a secondary data analysis on a longitudinal study. I developed some research questions and dove in. I looked for wave-to-wave changes in various constructs of interest to me. Quickly, though, I began asking questions about the growth and change of dynamic factors that I couldn’t answer with the methods I knew. One P.I. directed me towards structural equation modeling—as this was her background—with focus on growth models.</description>
     </item>
     
     <item>
       <title>Tidymodels: Decision Tree Learning in R</title>
-      <link>/data_sci/decision_trees_in_r/</link>
+      <link>/decision_trees_in_r/</link>
       <pubDate>Tue, 02 Jun 2020 00:00:00 +0000</pubDate>
       
-      <guid>/data_sci/decision_trees_in_r/</guid>
+      <guid>/decision_trees_in_r/</guid>
       <description>Intro Tidyverse’s newest release has recently come together to form a cohesive suite of packages for modeling and machine learning, called {tidymodels}. The successor to Max Kuhn’s {caret} package, {tidymodels} allows for a tidy approach to your data from start to finish. We’re going to walk through the basics for getting off the ground with {tidymodels} and demonstrate its application to three different tree-based methods for predicting student test scores.</description>
     </item>
     

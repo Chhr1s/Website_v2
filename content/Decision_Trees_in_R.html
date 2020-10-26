@@ -15,6 +15,7 @@ image:
   focal_point: ''
   preview_only: no
 projects: []
+sidemenu: "true"
 ---
 
 
@@ -522,7 +523,7 @@ dat &lt;- left_join(dat, frl)</code></pre>
   select(score, everything()) %&gt;% 
   cor(use = &quot;complete.obs&quot;) %&gt;% 
   corrplot::corrplot()</code></pre>
-<p><img src="/post/Decision_Trees_in_R_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/Decision_Trees_in_R_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="split-data-and-resample" class="section level1">
 <h1>Split data and resample</h1>
@@ -605,7 +606,7 @@ fit_bag &lt;- fit_resamples(
 <div id="visualize" class="section level3">
 <h3>Visualize</h3>
 <p>The plot below shows the root nodes from a bagged tree made of 100 trees (10 folds x 10 bootstrapped resamples). Root nodes are the 1st node in a decision tree, and they are determined by which variable best optimizes a loss function (e.g., minimizes mean square error [MSE] for continuous outcomes or Gini Index for categorical outcomes). Put roughly, the most common root nodes can be thought of as the most “important” predictors.</p>
-<p><img src="/post/Decision_Trees_in_R_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="/Decision_Trees_in_R_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 </div>
 <div id="random-forest" class="section level2">
@@ -644,7 +645,7 @@ fit_rf &lt;- fit_resamples(
 <div id="visualize-1" class="section level3">
 <h3>Visualize</h3>
 <p>The plot below shows the root nodes from a random forest with 1000 trees (specified using <code>set_args(trees = 1000)</code> in the parsnip model object).</p>
-<p><img src="/post/Decision_Trees_in_R_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="/Decision_Trees_in_R_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
 </div>
 <div id="boosted-trees" class="section level2">
