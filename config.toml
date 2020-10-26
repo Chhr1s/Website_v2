@@ -41,7 +41,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     pre = "<i class='fa fa-graph fa-fw'></i>"
     weight = 3
     identifier = "2020-09-08-growth-parallel-process-models"
-    url = "/PPM/"
+    url = "/2020-09-08-growth-parallel-process-models/"
   [[menu.main]]
     name = "Education"
     pre = "<i class='fa fa-school fa-fw'></i>"
