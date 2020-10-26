@@ -19,7 +19,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   googleAnalytics = "Your Google Analytics tracking ID"
   disqus = "Your Disqus shortname"
   # CSS name for highlight.js
-  highlightjs = "androidstudio"
+  #highlightjs = "androidstudio"
   dateFormat = "January 02 2006, 3:04 pm"
 
 [menu]
