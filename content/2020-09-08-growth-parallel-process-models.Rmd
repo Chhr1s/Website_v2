@@ -433,12 +433,24 @@ scale_y_continuous(name = "x",
               alpha = 0.2) + 
   theme_classic() + ggtitle('predicted x trajectories') 
 
+
 ```
 
-With this call, I can stack the actual and predicted trajectory graphs:
+Here is the individual trajectories again (below)
 
 ```{r}
-gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)
+individual_x_trajectories
+```
+
+We can compare those to the predicted trajectories (below)
+
+```{r}
+predicted_x_trajectories
+#gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)
+```
+
+```{r}
+#gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)
 ```
 
 For a quadratic model, this is more challenging, but here's some code to do it:
@@ -497,10 +509,17 @@ predicted_y_trajectories <- plot_dat_2 %>% ggplot(aes(x = Timepoint,
   theme_classic() + ggtitle('predicted trajectories of y')
 ```
 
-Again, let's stack the actual and predicted trajectory graphs:
+Here is the individual trajectories again (below)
 
 ```{r}
-gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)
+individual_y_trajectories
+```
+
+We can compare those to the predicted trajectories (below)
+
+```{r}
+predicted_y_trajectories
+#gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)
 ```
 
 # Next Steps:

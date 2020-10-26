@@ -1,7 +1,7 @@
 ---
-date: "2014-04-09"
+date: "2020-10-26"
 description: How to contact me
-sidemenu: "true"
+sidemenu: "false"
 title: Contact
 ---
 

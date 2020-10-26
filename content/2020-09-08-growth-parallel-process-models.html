@@ -507,9 +507,14 @@ scale_y_continuous(name = &quot;x&quot;,
                           color = participant_n),
               alpha = 0.2) + 
   theme_classic() + ggtitle(&#39;predicted x trajectories&#39;) </code></pre>
-<p>With this call, I can stack the actual and predicted trajectory graphs:</p>
-<pre class="r"><code>gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)</code></pre>
+<p>Here is the individual trajectories again (below)</p>
+<pre class="r"><code>individual_x_trajectories</code></pre>
 <p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>We can compare those to the predicted trajectories (below)</p>
+<pre class="r"><code>predicted_x_trajectories</code></pre>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<pre class="r"><code>#gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)</code></pre>
+<pre class="r"><code>#gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)</code></pre>
 <p>For a quadratic model, this is more challenging, but here’s some code to do it:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
 plot_dat$participant_n &lt;- 1:nrow(plot_dat)
@@ -562,9 +567,13 @@ predicted_y_trajectories &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint,
  geom_smooth(formula = y ~ x + I(x^2), 
              method = &quot;lm&quot;, se = F)+
   theme_classic() + ggtitle(&#39;predicted trajectories of y&#39;)</code></pre>
-<p>Again, let’s stack the actual and predicted trajectory graphs:</p>
-<pre class="r"><code>gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)</code></pre>
-<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Here is the individual trajectories again (below)</p>
+<pre class="r"><code>individual_y_trajectories</code></pre>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<p>We can compare those to the predicted trajectories (below)</p>
+<pre class="r"><code>predicted_y_trajectories</code></pre>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code>#gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)</code></pre>
 </div>
 <div id="next-steps" class="section level1">
 <h1>Next Steps:</h1>
