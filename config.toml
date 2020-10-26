@@ -14,7 +14,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
   # Shown in the home page
-  subtitle = "*Website Still In Development*"
+  subtitle = "See sidebar for stats & ML tutorials"
   brand = "CML"
   googleAnalytics = "Your Google Analytics tracking ID"
   disqus = "Your Disqus shortname"
