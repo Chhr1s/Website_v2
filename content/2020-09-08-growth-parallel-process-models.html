@@ -10,6 +10,7 @@ tags:
   - Structural Equation Modeling
 description: ''
 topics: []
+sidemenu: "true"
 ---
 
 
@@ -87,7 +88,7 @@ individual_x_trajectories &lt;-
   theme_classic() + xlim(1,4)
 
 individual_x_trajectories</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>You can see that the <code>{x}</code> variable is probably linearly increasing, but a very “shallow” quadratic model might fit better so we should check if it fits well. If both fit well, we will compare them with likelihood ratio tests (LRTs).</p>
 <pre class="r"><code>y_plot &lt;-
 pivot_longer(sim_growth_dat, 
@@ -105,7 +106,7 @@ individual_y_trajectories &lt;-
   ylab(&#39;y&#39;)+
   theme_classic()+xlim(1,4)
 individual_y_trajectories</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>It is clear that <code>{y}</code> decreases with time on average, but there is heterogeneity (or variability) in what happens for an individual case. It looks like a either a linear or quadratic model will fit best. </p>
 <p>Let’s dive in!</p>
 </div>
@@ -327,7 +328,7 @@ round(full_fit_stats,2) </code></pre>
 <pre class="r"><code>summary(full_fit,
         stand = T,
         rsq = T)</code></pre>
-<pre><code>## lavaan 0.6-7.1577 ended normally after 65 iterations
+<pre><code>## lavaan 0.6-8.1594 ended normally after 65 iterations
 ## 
 ##   Estimator                                         ML
 ##   Optimization method                           NLMINB
@@ -508,7 +509,7 @@ scale_y_continuous(name = &quot;x&quot;,
   theme_classic() + ggtitle(&#39;predicted x trajectories&#39;) </code></pre>
 <p>With this call, I can stack the actual and predicted trajectory graphs:</p>
 <pre class="r"><code>gridExtra::grid.arrange(individual_x_trajectories, predicted_x_trajectories, ncol=1)</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 <p>For a quadratic model, this is more challenging, but here’s some code to do it:</p>
 <pre class="r"><code>plot_dat &lt;- lavPredict(full_fit) %&gt;% data.frame()
 plot_dat$participant_n &lt;- 1:nrow(plot_dat)
@@ -563,7 +564,7 @@ predicted_y_trajectories &lt;- plot_dat_2 %&gt;% ggplot(aes(x = Timepoint,
   theme_classic() + ggtitle(&#39;predicted trajectories of y&#39;)</code></pre>
 <p>Again, let’s stack the actual and predicted trajectory graphs:</p>
 <pre class="r"><code>gridExtra::grid.arrange(individual_y_trajectories, predicted_y_trajectories, ncol=1)</code></pre>
-<p><img src="/post/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="/2020-09-08-growth-parallel-process-models_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 </div>
 <div id="next-steps" class="section level1">
 <h1>Next Steps:</h1>
