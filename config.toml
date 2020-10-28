@@ -14,12 +14,12 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 
 [params]
   # Shown in the home page
-  subtitle = "See sidebar for stats & ML tutorials!"
+  subtitle = "Homepage still in progress, see sidebar for projects"
   brand = "CML"
   googleAnalytics = "Your Google Analytics tracking ID"
   disqus = "Your Disqus shortname"
   # CSS name for highlight.js
-  #highlightjs = "androidstudio"
+  highlightjs = "Atelier Dune Dark"
   dateFormat = "January 02 2006, 3:04 pm"
 
 [menu]
