@@ -6,7 +6,7 @@ author = "Christopher M. Loan, MS"
 copyright = "&copy; 2020. All rights reserved."
 canonifyurls = true
 paginate = 10
-ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.DS_Store"]
 
 [indexes]
   tag = "tags"
@@ -42,12 +42,6 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
     weight = 3
     identifier = "/Growth and PPM"
     url = "/growth-parallel-process-models/"
-  [[menu.main]]
-    name = "DG Webtraffic Overtime"
-    pre = "<i class='fa fa-ruler fa-fw'></i>"
-    weight = 4
-    identifier = "/DG Webtraffic"
-    url = "/Popularity-of-DG/"
   #[[menu.main]]
   #  name = "Education"
   #  pre = "<i class='fa fa-school fa-fw'></i>"
